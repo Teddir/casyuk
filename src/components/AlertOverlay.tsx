@@ -1,5 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import mascotVideo from '../assets/mascot/0629.mp4';
+import { load } from '@tauri-apps/plugin-store';
+import { convertFileSrc } from '@tauri-apps/api/core';
+import { AlertTriangle, BatteryWarning } from 'lucide-react';
 
 interface AlertOverlayProps {
   percentage: number;
@@ -9,9 +12,39 @@ interface AlertOverlayProps {
   customAudioUrl?: string | null;
 }
 
-export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl, customAudioUrl }: AlertOverlayProps) {
+export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl: _customVideoUrl, customAudioUrl: _customAudioUrl }: AlertOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  // Customization State
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [showGlassCard, setShowGlassCard] = useState(true);
+  const [cardTitle, setCardTitle] = useState('');
+  const [cardMessage, setCardMessage] = useState('');
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const store = await load('settings.json');
+        
+        const savedVid = await store.get<{ value: string }>('custom_video_path');
+        const savedAud = await store.get<{ value: string }>('custom_audio_path');
+        const savedShowCard = await store.get<{ value: boolean }>('show_glass_card');
+        const savedTitle = await store.get<{ value: string }>('card_title');
+        const savedMessage = await store.get<{ value: string }>('card_message');
+        
+        if (savedVid?.value) setVideoUrl(convertFileSrc(savedVid.value));
+        if (savedAud?.value) setAudioUrl(convertFileSrc(savedAud.value));
+        if (savedShowCard !== null && savedShowCard !== undefined) setShowGlassCard(savedShowCard.value);
+        if (savedTitle?.value) setCardTitle(savedTitle.value);
+        if (savedMessage?.value) setCardMessage(savedMessage.value);
+      } catch (err) {
+        console.error("Failed to load settings:", err);
+      }
+    }
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -82,7 +115,7 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
       video.load();
       video.play().catch(e => console.error("Auto-play prevented", e));
     }
-  }, [customVideoUrl]);
+  }, [_customVideoUrl]);
 
   return (
     <div className={`alert-overlay`} style={{
@@ -97,8 +130,9 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
     }}>
       {/* Hidden Original Video */}
       <video
+        key={videoUrl || 'default'}
         ref={videoRef}
-        src={customVideoUrl || mascotVideo}
+        src={videoUrl || mascotVideo}
         autoPlay
         loop
         muted
@@ -107,8 +141,8 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
       />
 
       {/* Background Audio */}
-      {customAudioUrl && (
-        <audio src={customAudioUrl} autoPlay loop style={{ display: 'none' }} />
+      {audioUrl && (
+        <audio src={audioUrl} autoPlay loop style={{ display: 'none' }} />
       )}
 
       {/* Processed Chroma Key Canvas */}
@@ -126,22 +160,24 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
       />
 
       {/* Glassmorphism Card */}
-      <div className="glass-card" style={{ position: 'relative', zIndex: 1 }}>
-        <h1 className="alert-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: '#ffffff', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
-          {isCritical ? '⚠️ CRITICAL BATTERY!' : '🔋 Battery Low'}
-        </h1>
-        <p className="alert-message" style={{ fontSize: '1.4rem', color: 'rgba(255,255,255,0.95)', marginBottom: '0.5rem' }}>
-          Your battery is at <strong style={{ fontSize: '1.8rem', color: isCritical ? '#ff3b30' : '#4cd964', textShadow: '0 2px 5px rgba(0,0,0,0.5)' }}>{percentage}%</strong>.
-        </p>
-        <p className="alert-submessage" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
-          {isCritical
-            ? 'Please plug in your charger immediately before your device dies!'
-            : 'Consider plugging in your charger soon.'}
-        </p>
-        <button className="dismiss-btn glass-btn" onClick={onDismiss}>
-          I understand
-        </button>
-      </div>
+      {showGlassCard && (
+        <div className="glass-card" style={{ position: 'relative', zIndex: 1 }}>
+          <h1 className="alert-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: '#ffffff', textShadow: '0 2px 10px rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem' }}>
+            {cardTitle ? cardTitle : isCritical ? <><AlertTriangle size={36} /> CRITICAL BATTERY!</> : <><BatteryWarning size={36} /> Battery Low</>}
+          </h1>
+          <p className="alert-message" style={{ fontSize: '1.4rem', color: 'rgba(255,255,255,0.95)', marginBottom: '0.5rem' }}>
+            Your battery is at <strong style={{ fontSize: '1.8rem', color: isCritical ? '#ff3b30' : '#4cd964', textShadow: '0 2px 5px rgba(0,0,0,0.5)' }}>{percentage}%</strong>.
+          </p>
+          <p className="alert-submessage" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
+            {cardMessage || (isCritical
+              ? 'Please plug in your charger immediately before your device dies!'
+              : 'Consider plugging in your charger soon.')}
+          </p>
+          <button className="dismiss-btn glass-btn" onClick={onDismiss}>
+            I understand
+          </button>
+        </div>
+      )}
     </div>
   );
 }

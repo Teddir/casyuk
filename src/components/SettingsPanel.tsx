@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { load } from '@tauri-apps/plugin-store';
 import { emit } from '@tauri-apps/api/event';
-import { open } from '@tauri-apps/plugin-dialog';
+import { Settings } from 'lucide-react';
 
 export function SettingsPanel() {
   const [lowThreshold, setLowThreshold] = useState(20);
   const [criticalThreshold, setCriticalThreshold] = useState(5);
   const [store, setStore] = useState<any>(null);
-  const [customVideoPath, setCustomVideoPath] = useState('');
-  const [customAudioPath, setCustomAudioPath] = useState('');
 
   useEffect(() => {
     async function initStore() {
@@ -17,13 +15,9 @@ export function SettingsPanel() {
       
       const savedLow = await s.get<{ value: number }>('low_threshold');
       const savedCrit = await s.get<{ value: number }>('critical_threshold');
-      const savedVid = await s.get<{ value: string }>('custom_video_path');
-      const savedAud = await s.get<{ value: string }>('custom_audio_path');
       
       if (savedLow) setLowThreshold(savedLow.value);
       if (savedCrit) setCriticalThreshold(savedCrit.value);
-      if (savedVid) setCustomVideoPath(savedVid.value);
-      if (savedAud) setCustomAudioPath(savedAud.value);
     }
     initStore();
   }, []);
@@ -39,123 +33,81 @@ export function SettingsPanel() {
   const handleCriticalChange = async (val: number) => {
     setCriticalThreshold(val);
     if (store) {
-      await store.set('low_threshold', { value: lowThreshold });
-      await store.set('critical_threshold', { value: criticalThreshold });
-      await store.set('custom_video_path', { value: customVideoPath });
-      await store.set('custom_audio_path', { value: customAudioPath });
-      await store.save();
-    }
-  };
-
-  const handlePickVideo = async () => {
-    const selected = await open({
-      multiple: false,
-      filters: [{ name: 'Video', extensions: ['mp4', 'mov', 'webm'] }]
-    });
-    if (selected && typeof selected === 'string') {
-      setCustomVideoPath(selected);
-      if (store) {
-        await store.set('custom_video_path', { value: selected });
-        await store.save();
-      }
-    }
-  };
-
-  const handlePickAudio = async () => {
-    const selected = await open({
-      multiple: false,
-      filters: [{ name: 'Audio', extensions: ['mp3', 'wav', 'ogg'] }]
-    });
-    if (selected && typeof selected === 'string') {
-      setCustomAudioPath(selected);
-      if (store) {
-        await store.set('custom_audio_path', { value: selected });
-        await store.save();
-      }
-    }
-  };
-
-  const handleResetMedia = async () => {
-    setCustomVideoPath('');
-    setCustomAudioPath('');
-    if (store) {
-      await store.delete('custom_video_path');
-      await store.delete('custom_audio_path');
+      await store.set('critical_threshold', { value: val });
       await store.save();
     }
   };
 
   return (
     <div className="settings-panel">
-      <h2>⚙️ Settings</h2>
-      <p>Configure your CasYuk behavior here.</p>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Settings size={28} /> App Settings</h2>
+        <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Configure notification thresholds and application behavior.</p>
+      </div>
       
-      <div className="settings-group">
-        <label>
-          <span>Low Battery Alert Threshold: <strong>{lowThreshold}%</strong></span>
-          <input 
-            type="range" min="5" max="100" 
-            value={lowThreshold} 
-            onChange={(e) => handleLowChange(Number(e.target.value))} 
-          />
-        </label>
-        
-        <label>
-          <span>Critical Battery Alert Threshold: <strong>{criticalThreshold}%</strong></span>
-          <input 
-            type="range" min="1" max="100" 
-            value={criticalThreshold} 
-            onChange={(e) => handleCriticalChange(Number(e.target.value))} 
-          />
-        </label>
-
-        <label className="checkbox-label">
-          <input type="checkbox" defaultChecked />
-          <span>Enable sound alerts (Coming in Sprint 4)</span>
-        </label>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <h3>🎨 Customization</h3>
-        <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label style={{ width: '150px' }}>Custom Video:</label>
-          <input type="text" readOnly value={customVideoPath || 'Default (0629.mp4)'} style={{ flex: 1, padding: '0.5rem' }} />
-          <button onClick={handlePickVideo} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>Browse...</button>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label style={{ width: '150px' }}>Custom Audio:</label>
-          <input type="text" readOnly value={customAudioPath || 'None (Silent)'} style={{ flex: 1, padding: '0.5rem' }} />
-          <button onClick={handlePickAudio} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>Browse...</button>
-        </div>
-        <div style={{ marginTop: '10px', textAlign: 'right' }}>
-          <button onClick={handleResetMedia} style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#ff3b30', color: 'white', border: 'none', borderRadius: '4px' }}>
-            🔄 Reset to Default
-          </button>
-        </div>
-        <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '10px' }}>
-          *Note: Video background must be green screen for chroma-key transparency to work.
-        </p>
-      </div>
-
-      {import.meta.env.DEV && (
-        <div style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-          <h3 style={{ marginTop: 0 }}>Debug / Testing</h3>
-          <p style={{ fontSize: '0.9rem', color: '#a0a0a0' }}>
-            *The Rule Engine in Rust only fires if your laptop is NOT charging. You can use these buttons to bypass it and test the UI directly.*
-          </p>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button onClick={() => emit('test-alert-event', { percentage: 15, is_critical: false })} 
-              style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
-              Test Low Alert
-            </button>
+      <div className="widgets-row">
+        <div className="widget-card">
+          <div className="widget-header">
+            <h3>Notification Thresholds</h3>
+          </div>
+          <div className="widget-content">
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: 700 }}>Low Battery Alert</span>
+                <span className="badge warning" style={{ fontSize: '1rem' }}>{lowThreshold}%</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
+                Triggers when battery drops below this percentage.
+              </p>
+              <input 
+                type="range" min="5" max="50" 
+                value={lowThreshold} 
+                onChange={(e) => handleLowChange(Number(e.target.value))} 
+                style={{ width: '100%', accentColor: 'var(--accent-orange)' }}
+              />
+            </div>
             
-            <button onClick={() => emit('test-alert-event', { percentage: 4, is_critical: true })} 
-              style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#ff3b30', color: 'white', border: 'none' }}>
-              Test Critical Alert
-            </button>
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: 700 }}>Critical Battery Alert</span>
+                <span className="badge critical" style={{ fontSize: '1rem', background: 'var(--accent-red)' }}>{criticalThreshold}%</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
+                Triggers urgent window popup. Must be lower than Low Alert.
+              </p>
+              <input 
+                type="range" min="1" max={Math.min(lowThreshold - 1, 30)} 
+                value={criticalThreshold} 
+                onChange={(e) => handleCriticalChange(Number(e.target.value))} 
+                style={{ width: '100%', accentColor: 'var(--accent-red)' }}
+              />
+            </div>
           </div>
         </div>
-      )}
+
+        <div className="widget-card">
+          <div className="widget-header">
+            <h3>Developer / Debugging</h3>
+          </div>
+          <div className="widget-content">
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+              Use these tools to manually trigger the pop-ups and test your chroma-key video settings.
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <button onClick={() => emit('test-alert-event', { percentage: lowThreshold, is_critical: false })} 
+                className="text-btn" style={{ background: 'var(--accent-orange)' }}>
+                Test Low Battery Popup
+              </button>
+              
+              <button onClick={() => emit('test-alert-event', { percentage: criticalThreshold, is_critical: true })} 
+                className="text-btn" style={{ background: 'var(--accent-red)' }}>
+                Test Critical Battery Popup
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
