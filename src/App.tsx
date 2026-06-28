@@ -1,49 +1,90 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { useState } from 'react';
+import { useBattery } from './hooks/useBattery';
+import { BatteryGauge } from './components/BatteryGauge';
+import { SettingsPanel } from './components/SettingsPanel';
+import { MascotRenderer } from './components/MascotRenderer';
+import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
+import './App.css';
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const { battery, error } = useBattery(5000);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'settings'>('dashboard');
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  const testNotification = async () => {
+    try {
+      console.log('Testing notification...');
+      let permissionGranted = await isPermissionGranted();
+      console.log('Permission initially granted?', permissionGranted);
+      
+      if (!permissionGranted) {
+        console.log('Requesting permission...');
+        const permission = await requestPermission();
+        console.log('Permission result:', permission);
+        permissionGranted = permission === 'granted';
+      }
+      
+      if (permissionGranted) {
+        console.log('Sending notification...');
+        sendNotification({ title: 'CasYuk 🔋', body: 'This is a test notification from your battery companion!' });
+        console.log('Notification sent.');
+      } else {
+        console.log('Permission denied, cannot send notification.');
+      }
+    } catch (err) {
+      console.error('Error sending notification:', err);
+    }
+  };
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+      <header>
+        <h1>CasYuk 🔋</h1>
+        <p>Your emotional battery companion</p>
+      </header>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <nav className="view-switcher">
+        <button 
+          className={currentView === 'dashboard' ? 'active' : ''} 
+          onClick={() => setCurrentView('dashboard')}
+        >
+          Dashboard
+        </button>
+        <button 
+          className={currentView === 'settings' ? 'active' : ''} 
+          onClick={() => setCurrentView('settings')}
+        >
+          Settings
+        </button>
+      </nav>
 
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      <section className="main-content">
+        {currentView === 'dashboard' ? (
+          <div className="dashboard-view">
+            {battery ? (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                  <MascotRenderer 
+                    percentage={battery.percentage} 
+                    lowThreshold={20} 
+                    criticalThreshold={5} 
+                    size={200}
+                  />
+                </div>
+                <BatteryGauge status={battery} error={error} />
+              </>
+            ) : (
+              <div style={{ padding: '2rem', textAlign: 'center' }}>
+                <p>Membaca sensor baterai...</p>
+              </div>
+            )}
+            <button className="test-notif-btn" onClick={testNotification}>
+              🔔 Test Notification
+            </button>
+          </div>
+        ) : (
+          <SettingsPanel />
+        )}
+      </section>
     </main>
   );
 }

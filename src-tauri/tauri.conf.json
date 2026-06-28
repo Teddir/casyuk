@@ -10,15 +10,33 @@
     "frontendDist": "../dist"
   },
   "app": {
+    "macOSPrivateApi": true,
     "windows": [
       {
         "title": "casyuk",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "label": "main"
+      },
+      {
+        "title": "CasYuk Alert",
+        "label": "alert",
+        "width": 800,
+        "height": 600,
+        "transparent": true,
+        "decorations": false,
+        "visible": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "url": "/?window=alert"
       }
     ],
     "security": {
       "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/32x32.png",
+      "tooltip": "CasYuk 🔋"
     }
   },
   "bundle": {
