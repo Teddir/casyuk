@@ -5,6 +5,8 @@ use battery::Manager;
 pub struct BatteryStatus {
     pub percentage: u8,
     pub state: String,
+    pub health: u8,
+    pub cycle_count: u32,
 }
 
 pub fn get_status() -> Result<BatteryStatus, String> {
@@ -15,6 +17,11 @@ pub fn get_status() -> Result<BatteryStatus, String> {
     if let Some(Ok(battery)) = batteries.next() {
         // state_of_charge is a ratio from 0.0 to 1.0
         let percentage = (battery.state_of_charge().value * 100.0).round() as u8;
+        
+        // state_of_health is a ratio from 0.0 to 1.0
+        let health = (battery.state_of_health().value * 100.0).round() as u8;
+        
+        let cycle_count = battery.cycle_count().unwrap_or(0);
         
         let state = match battery.state() {
             battery::State::Charging => "charging",
@@ -28,6 +35,8 @@ pub fn get_status() -> Result<BatteryStatus, String> {
         Ok(BatteryStatus {
             percentage,
             state,
+            health,
+            cycle_count,
         })
     } else {
         Err("No battery found on this system".to_string())
