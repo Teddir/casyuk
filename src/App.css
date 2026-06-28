@@ -481,6 +481,7 @@ body {
 .widget-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 350px;
   padding-right: 0.5rem;
 }

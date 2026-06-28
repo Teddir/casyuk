@@ -16,6 +16,21 @@ fn get_battery_status() -> Result<battery::BatteryStatus, String> {
     battery::get_status()
 }
 
+#[tauri::command]
+fn get_advanced_info() -> Result<battery::AdvancedHardwareInfo, String> {
+    battery::get_advanced_info()
+}
+
+#[tauri::command]
+fn get_charging_control_info() -> Result<battery::ChargingControlInfo, String> {
+    battery::get_charging_control_info()
+}
+
+#[tauri::command]
+fn apply_charging_settings(limit_80: bool, smart_discharge: bool) -> Result<(), String> {
+    battery::apply_charging_settings(limit_80, smart_discharge)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -36,7 +51,13 @@ pub fn run() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![greet, get_battery_status])
+        .invoke_handler(tauri::generate_handler![
+            greet, 
+            get_battery_status,
+            get_advanced_info,
+            get_charging_control_info,
+            apply_charging_settings
+        ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")
         .run(|app_handle, event| {

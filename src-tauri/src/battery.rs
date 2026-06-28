@@ -1,5 +1,6 @@
 use serde::Serialize;
 use battery::Manager;
+use std::process::Command;
 
 #[derive(Serialize)]
 pub struct BatteryStatus {
@@ -11,16 +12,11 @@ pub struct BatteryStatus {
 
 pub fn get_status() -> Result<BatteryStatus, String> {
     let manager = Manager::new().map_err(|e| e.to_string())?;
-    
     let mut batteries = manager.batteries().map_err(|e| e.to_string())?;
     
     if let Some(Ok(battery)) = batteries.next() {
-        // state_of_charge is a ratio from 0.0 to 1.0
         let percentage = (battery.state_of_charge().value * 100.0).round() as u8;
-        
-        // state_of_health is a ratio from 0.0 to 1.0
         let health = (battery.state_of_health().value * 100.0).round() as u8;
-        
         let cycle_count = battery.cycle_count().unwrap_or(0);
         
         let state = match battery.state() {
@@ -29,16 +25,151 @@ pub fn get_status() -> Result<BatteryStatus, String> {
             battery::State::Empty => "empty",
             battery::State::Full => "full",
             battery::State::Unknown => "unknown",
-            _ => "unknown", // To be safe with future versions
+            _ => "unknown",
         }.to_string();
 
-        Ok(BatteryStatus {
-            percentage,
-            state,
-            health,
-            cycle_count,
-        })
+        Ok(BatteryStatus { percentage, state, health, cycle_count })
     } else {
         Err("No battery found on this system".to_string())
+    }
+}
+
+#[derive(Serialize)]
+pub struct AdvancedHardwareInfo {
+    pub technology: String,
+    pub temperature: String,
+    pub design_capacity: String,
+    pub serial_number: String,
+}
+
+pub fn get_advanced_info() -> Result<AdvancedHardwareInfo, String> {
+    let output = Command::new("ioreg")
+        .args(["-r", "-c", "AppleSmartBattery"])
+        .output()
+        .map_err(|e| e.to_string())?;
+        
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    
+    let mut temp = String::from("N/A");
+    let mut design_cap = String::from("N/A");
+    let mut serial = String::from("N/A");
+    
+    for line in stdout.lines() {
+        if line.contains("\"Temperature\"") {
+            if let Some(val) = line.split('=').nth(1) {
+                let t: f64 = val.trim().parse().unwrap_or(0.0);
+                temp = format!("{:.1}°C", t / 100.0);
+            }
+        }
+        if line.contains("\"DesignCapacity\"") {
+            if let Some(val) = line.split('=').nth(1) {
+                design_cap = format!("{} mAh", val.trim());
+            }
+        }
+    }
+    
+    if let Some(idx) = stdout.find("\"Serial\"=\"") {
+        let start = idx + 10;
+        if let Some(end) = stdout[start..].find('"') {
+            serial = stdout[start..start+end].to_string();
+        }
+    }
+    
+    Ok(AdvancedHardwareInfo {
+        technology: "Lithium-Ion".to_string(),
+        temperature: temp,
+        design_capacity: design_cap,
+        serial_number: serial,
+    })
+}
+
+#[derive(Serialize)]
+pub struct ChargingControlInfo {
+    pub source_type: String,
+    pub current_draw: String,
+    pub adapter_wattage: String,
+    pub time_to_full: String,
+}
+
+pub fn get_charging_control_info() -> Result<ChargingControlInfo, String> {
+    let ioreg = Command::new("ioreg")
+        .args(["-r", "-c", "AppleSmartBattery"])
+        .output()
+        .map_err(|e| e.to_string())?;
+    let ioreg_str = String::from_utf8_lossy(&ioreg.stdout);
+    
+    let mut amperage = 0.0;
+    let mut time_to_full = String::from("N/A");
+    
+    for line in ioreg_str.lines() {
+        if line.contains("\"Amperage\"") {
+            if let Some(val) = line.split('=').nth(1) {
+                amperage = val.trim().parse().unwrap_or(0.0);
+            }
+        }
+        if line.contains("\"TimeRemaining\"") {
+             if let Some(val) = line.split('=').nth(1) {
+                 let mins: i32 = val.trim().parse().unwrap_or(0);
+                 if mins > 0 && mins < 1000 {
+                     time_to_full = format!("{}h {}m", mins / 60, mins % 60);
+                 }
+             }
+        }
+    }
+    
+    let sp = Command::new("system_profiler")
+        .arg("SPPowerDataType")
+        .output()
+        .map_err(|e| e.to_string())?;
+    let sp_str = String::from_utf8_lossy(&sp.stdout);
+    
+    let mut wattage = String::from("Not Connected");
+    let mut source = String::from("Internal Battery");
+    
+    if sp_str.contains("Connected: Yes") {
+        source = String::from("AC Power");
+        for line in sp_str.lines() {
+            if line.contains("Wattage (W):") {
+                if let Some(val) = line.split(':').nth(1) {
+                    wattage = format!("{} W", val.trim());
+                }
+            }
+        }
+    }
+    
+    Ok(ChargingControlInfo {
+        source_type: source,
+        current_draw: format!("{:.2} A", f64::abs(amperage / 1000.0)),
+        adapter_wattage: wattage,
+        time_to_full,
+    })
+}
+
+pub fn apply_charging_settings(limit_80: bool, _smart_discharge: bool) -> Result<(), String> {
+    let val = if limit_80 { "80" } else { "100" };
+    
+    let check = Command::new("which").arg("bclm").output();
+    if let Ok(out) = check {
+        if out.stdout.is_empty() {
+            return Err("System requirement missing: 'bclm' is not installed. Please install it using Homebrew:\n\nbrew tap zackelia/formulae && brew install bclm".to_string());
+        }
+    } else {
+        return Err("Failed to check for bclm on this system.".to_string());
+    }
+    
+    let script = format!("do shell script \"/opt/homebrew/bin/bclm write {} || /usr/local/bin/bclm write {}\" with administrator privileges", val, val);
+    
+    let status = Command::new("osascript")
+        .args(["-e", &script])
+        .status()
+        .map_err(|e| e.to_string())?;
+        
+    if status.success() {
+        // Apply it immediately
+        let persist = format!("do shell script \"/opt/homebrew/bin/bclm persist || /usr/local/bin/bclm persist\" with administrator privileges");
+        let _ = Command::new("osascript").args(["-e", &persist]).status();
+        Ok(())
+    } else {
+        Err("Failed to apply charging limit. Administrator privileges are required.".to_string())
     }
 }
