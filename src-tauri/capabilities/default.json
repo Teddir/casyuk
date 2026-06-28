@@ -12,6 +12,7 @@
     "notification:allow-is-permission-granted",
     "core:tray:default",
     "store:default",
+    "dialog:default",
     "core:window:allow-set-fullscreen",
     "core:window:allow-set-always-on-top",
     "core:window:allow-show",

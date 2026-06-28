@@ -22,6 +22,7 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .manage(Mutex::new(rules::CooldownState::new()))
         .setup(|app| {
             tray::create_tray(app.handle())?;
@@ -45,10 +46,6 @@ pub fn run() {
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
-                }
-                tauri::RunEvent::ExitRequested { api, .. } => {
-                    // Prevent the app from exiting completely, forcing it to stay as a daemon
-                    api.prevent_exit();
                 }
                 _ => {}
             }

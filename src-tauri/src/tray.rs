@@ -6,7 +6,8 @@ use tauri::{
 
 pub fn create_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let show_i = MenuItem::with_id(app, "show", "Show CasYuk", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show_i])?;
+    let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+    let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
     if let Some(tray) = app.tray_by_id("main") {
         let _ = tray.set_menu(Some(menu));
@@ -17,6 +18,9 @@ pub fn create_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
                     let _ = window.show();
                     let _ = window.set_focus();
                 }
+            }
+            "quit" => {
+                app.exit(0);
             }
             _ => {}
         });

@@ -5,9 +5,11 @@ interface AlertOverlayProps {
   percentage: number;
   isCritical: boolean;
   onDismiss: () => void;
+  customVideoUrl?: string | null;
+  customAudioUrl?: string | null;
 }
 
-export function AlertOverlay({ percentage, isCritical, onDismiss }: AlertOverlayProps) {
+export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl, customAudioUrl }: AlertOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -47,9 +49,12 @@ export function AlertOverlay({ percentage, isCritical, onDismiss }: AlertOverlay
       animationFrameId = requestAnimationFrame(processFrame);
     };
 
-    video.addEventListener('play', () => {
+    const handlePlay = () => {
+      cancelAnimationFrame(animationFrameId);
       animationFrameId = requestAnimationFrame(processFrame);
-    });
+    };
+
+    video.addEventListener('play', handlePlay);
 
     // Handle window resize
     const handleResize = () => {
@@ -57,12 +62,27 @@ export function AlertOverlay({ percentage, isCritical, onDismiss }: AlertOverlay
       canvas.height = window.innerHeight;
     };
     window.addEventListener('resize', handleResize);
+    
+    // If it's already playing
+    if (!video.paused) {
+      handlePlay();
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      video.removeEventListener('play', handlePlay);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  // Force video reload and play when source changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.load();
+      video.play().catch(e => console.error("Auto-play prevented", e));
+    }
+  }, [customVideoUrl]);
 
   return (
     <div className={`alert-overlay`} style={{
@@ -78,13 +98,18 @@ export function AlertOverlay({ percentage, isCritical, onDismiss }: AlertOverlay
       {/* Hidden Original Video */}
       <video
         ref={videoRef}
-        src={mascotVideo}
+        src={customVideoUrl || mascotVideo}
         autoPlay
         loop
         muted
         playsInline
         style={{ display: 'none' }}
       />
+
+      {/* Background Audio */}
+      {customAudioUrl && (
+        <audio src={customAudioUrl} autoPlay loop style={{ display: 'none' }} />
+      )}
 
       {/* Processed Chroma Key Canvas */}
       <canvas

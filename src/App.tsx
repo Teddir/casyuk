@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useBattery } from './hooks/useBattery';
 import { BatteryGauge } from './components/BatteryGauge';
 import { SettingsPanel } from './components/SettingsPanel';
-import { MascotRenderer } from './components/MascotRenderer';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import './App.css';
 
@@ -62,14 +61,6 @@ function App() {
           <div className="dashboard-view">
             {battery ? (
               <>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-                  <MascotRenderer 
-                    percentage={battery.percentage} 
-                    lowThreshold={20} 
-                    criticalThreshold={5} 
-                    size={200}
-                  />
-                </div>
                 <BatteryGauge status={battery} error={error} />
               </>
             ) : (
@@ -77,9 +68,12 @@ function App() {
                 <p>Membaca sensor baterai...</p>
               </div>
             )}
-            <button className="test-notif-btn" onClick={testNotification}>
-              🔔 Test Notification
-            </button>
+            
+            {import.meta.env.DEV && (
+              <button className="test-notif-btn" onClick={testNotification}>
+                🔔 Test Notification
+              </button>
+            )}
           </div>
         ) : (
           <SettingsPanel />

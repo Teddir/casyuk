@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { sendNotification } from '@tauri-apps/plugin-notification';
+import { load } from '@tauri-apps/plugin-store';
 import { AlertOverlay } from './components/AlertOverlay';
+import { convertFileSrc } from '@tauri-apps/api/core';
 import './App.css';
 
 interface AlertData {
@@ -12,11 +14,36 @@ interface AlertData {
 
 export function AlertWindow() {
   const [activeAlert, setActiveAlert] = useState<AlertData | null>(null);
+  const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null);
+  const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    async function loadSettings() {
+      try {
+        const store = await load('settings.json');
+        const savedVid = await store.get<{ value: string }>('custom_video_path');
+        const savedAud = await store.get<{ value: string }>('custom_audio_path');
+        
+        if (savedVid && savedVid.value) {
+          setCustomVideoUrl(convertFileSrc(savedVid.value));
+        } else {
+          setCustomVideoUrl(null);
+        }
+        
+        if (savedAud && savedAud.value) {
+          setCustomAudioUrl(convertFileSrc(savedAud.value));
+        } else {
+          setCustomAudioUrl(null);
+        }
+      } catch (e) {
+        console.error('Failed to load custom media settings', e);
+      }
+    }
+
     // Listen for alerts from Rust
     const unlisten = listen<string>('trigger-alert', async (event) => {
       try {
+        await loadSettings(); // Reload settings right before showing
         const payload = JSON.parse(event.payload) as AlertData;
         setActiveAlert(payload);
         
@@ -37,6 +64,7 @@ export function AlertWindow() {
     
     // Listen for testing button dispatch from the main window
     const unlistenTest = listen<AlertData>('test-alert-event', async (event) => {
+      await loadSettings(); // Reload settings right before showing
       setActiveAlert(event.payload);
       const appWindow = getCurrentWindow();
       await appWindow.maximize();
@@ -74,6 +102,8 @@ export function AlertWindow() {
         percentage={activeAlert.percentage} 
         isCritical={activeAlert.is_critical} 
         onDismiss={handleDismiss} 
+        customVideoUrl={customVideoUrl}
+        customAudioUrl={customAudioUrl}
       />
     </div>
   );
