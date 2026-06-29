@@ -16,7 +16,30 @@ pub fn get_status() -> Result<BatteryStatus, String> {
     
     if let Some(Ok(battery)) = batteries.next() {
         let percentage = (battery.state_of_charge().value * 100.0).round() as u8;
-        let health = (battery.state_of_health().value * 100.0).round() as u8;
+        let mut health = (battery.state_of_health().value * 100.0).round() as u8;
+        
+        if health < 10 {
+            if let Ok(output) = std::process::Command::new("ioreg").args(["-r", "-c", "AppleSmartBattery"]).output() {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let mut raw_max = 0.0;
+                let mut design = 0.0;
+                for line in stdout.lines() {
+                    if line.contains("\"AppleRawMaxCapacity\"") {
+                        if let Some(val) = line.split('=').nth(1) {
+                            raw_max = val.trim().parse().unwrap_or(0.0);
+                        }
+                    } else if line.contains("\"DesignCapacity\"") {
+                        if let Some(val) = line.split('=').nth(1) {
+                            design = val.trim().parse().unwrap_or(0.0);
+                        }
+                    }
+                }
+                if design > 0.0 && raw_max > 0.0 {
+                    health = f64::round((raw_max / design) * 100.0) as u8;
+                }
+            }
+        }
+
         let cycle_count = battery.cycle_count().unwrap_or(0);
         
         let state = match battery.state() {

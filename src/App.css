@@ -67,7 +67,8 @@ body {
   flex-direction: column;
   box-sizing: border-box;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 10;
 }
 
@@ -270,17 +271,20 @@ body {
 
 .topbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2.5rem;
   background-color: var(--primary-color);
   border-bottom: 2px solid var(--border-color);
+  gap: 1rem;
 }
 
 .topbar-left {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .mobile-menu-btn {
@@ -291,12 +295,16 @@ body {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .icon-btn {
@@ -312,6 +320,7 @@ body {
   font-size: 1.2rem;
   box-shadow: 3px 3px 0px var(--border-color);
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .icon-btn:hover {
@@ -331,9 +340,12 @@ body {
   border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 0.5rem 1rem;
-  width: 250px;
+  width: 100%;
+  max-width: 250px;
   box-shadow: 3px 3px 0px var(--border-color);
   transition: all 0.2s ease;
+  flex: 1;
+  min-width: 150px;
 }
 
 .search-box:focus-within {
@@ -710,13 +722,21 @@ body {
   }
 
   .topbar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .topbar-actions {
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .search-box {
     width: 100%;
+    flex: 1;
+    min-width: 150px;
   }
 
   .widgets-row {

@@ -3,6 +3,32 @@ import { load } from '@tauri-apps/plugin-store';
 import { emit } from '@tauri-apps/api/event';
 import { Settings } from 'lucide-react';
 
+const BatterySlider = ({ value, onChange, min, max, color }: { value: number, onChange: (v: number) => void, min: number, max: number, color: string }) => {
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '36px', display: 'flex', alignItems: 'center', marginTop: '0.5rem' }}>
+      <div style={{ flex: 1, height: '100%', border: '3px solid var(--border-color)', borderRadius: '8px', padding: '3px', position: 'relative', background: 'var(--card-bg)', boxShadow: '3px 3px 0px var(--border-color)' }}>
+        <div style={{ width: `${value}%`, height: '100%', background: color, borderRadius: '4px', transition: 'width 0.1s ease-out' }}></div>
+      </div>
+      <div style={{ width: '8px', height: '16px', background: 'var(--border-color)', borderRadius: '0 4px 4px 0', marginLeft: '3px' }}></div>
+      
+      <input 
+        type="range" 
+        min="0" 
+        max="100" 
+        value={value} 
+        onChange={(e) => {
+          let val = Number(e.target.value);
+          if (val > max) val = max;
+          if (val < min) val = min;
+          onChange(val);
+        }} 
+        style={{ position: 'absolute', top: 0, left: 0, width: 'calc(100% - 11px)', height: '100%', opacity: 0, cursor: 'pointer', margin: 0, padding: 0 }}
+        title={`Set threshold (Min: ${min}%, Max: ${max}%)`}
+      />
+    </div>
+  );
+};
+
 export function SettingsPanel() {
   const [lowThreshold, setLowThreshold] = useState(20);
   const [criticalThreshold, setCriticalThreshold] = useState(5);
@@ -50,7 +76,7 @@ export function SettingsPanel() {
           <div className="widget-header">
             <h3>Notification Thresholds</h3>
           </div>
-          <div className="widget-content">
+          <div className="widget-content" style={{ padding: '0.5rem' }}>
             <div style={{ marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                 <span style={{ fontWeight: 700 }}>Low Battery Alert</span>
@@ -59,11 +85,12 @@ export function SettingsPanel() {
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
                 Triggers when battery drops below this percentage.
               </p>
-              <input 
-                type="range" min="5" max="50" 
+              <BatterySlider 
                 value={lowThreshold} 
-                onChange={(e) => handleLowChange(Number(e.target.value))} 
-                style={{ width: '100%', accentColor: 'var(--accent-orange)' }}
+                onChange={handleLowChange} 
+                min={5} 
+                max={50} 
+                color="var(--accent-orange)" 
               />
             </div>
             
@@ -75,11 +102,12 @@ export function SettingsPanel() {
               <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem', fontWeight: 600 }}>
                 Triggers urgent window popup. Must be lower than Low Alert.
               </p>
-              <input 
-                type="range" min="1" max={Math.min(lowThreshold - 1, 30)} 
+              <BatterySlider 
                 value={criticalThreshold} 
-                onChange={(e) => handleCriticalChange(Number(e.target.value))} 
-                style={{ width: '100%', accentColor: 'var(--accent-red)' }}
+                onChange={handleCriticalChange} 
+                min={1} 
+                max={Math.min(lowThreshold - 1, 30)} 
+                color="var(--accent-red)" 
               />
             </div>
           </div>

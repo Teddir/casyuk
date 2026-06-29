@@ -96,10 +96,12 @@ function App() {
               </div>
               <div className="stat-value">
                 <h2>{battery?.percentage !== undefined ? `${Math.round(battery.percentage)}%` : '--'}</h2>
-                <span className={`badge ${isCharging ? 'positive' : 'warning'}`}>
-                  {isCharging ? 'Charging' : 'On Battery'}
-                </span>
-                <span className="badge neutral">{isCharging ? 'AC Adapter' : 'Internal'}</span>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <span className={`badge ${isCharging ? 'positive' : 'warning'}`}>
+                    {isCharging ? 'Charging' : 'On Battery'}
+                  </span>
+                  <span className="badge neutral">{isCharging ? 'AC Adapter' : 'Internal'}</span>
+                </div>
               </div>
             </div>
 
