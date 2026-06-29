@@ -21,7 +21,7 @@ pub fn create_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             "quit" => {
-                app.exit(0);
+                std::process::exit(0);
             }
             _ => {}
         })
