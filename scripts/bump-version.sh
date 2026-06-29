@@ -17,6 +17,6 @@ sed -i '' -e 's/"version": ".*"/"version": "'$NEW_VERSION'"/' package.json
 sed -i '' -e 's/"version": ".*"/"version": "'$NEW_VERSION'"/' src-tauri/tauri.conf.json
 
 # Update Cargo.toml
-sed -i '' -e 's/version = ".*"/version = "'$NEW_VERSION'"/' src-tauri/Cargo.toml
+sed -i '' -e 's/^version = ".*"/version = "'$NEW_VERSION'"/' src-tauri/Cargo.toml
 
 echo "Version bumped successfully!"
