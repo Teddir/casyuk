@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { load } from '@tauri-apps/plugin-store';
 import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
+import { emit } from '@tauri-apps/api/event';
 import { Palette, RotateCcw, Save, Music } from 'lucide-react';
 import mascotVideo from '../assets/mascot/0629.mp4';
 
@@ -217,6 +218,31 @@ export function CustomizationPanel() {
                   {cardMessage || 'Preview message...'}
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="widgets-row" style={{ marginTop: '2.5rem' }}>
+        <div className="widget-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="widget-header">
+            <h3>Developer / Debugging</h3>
+          </div>
+          <div className="widget-content">
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem', fontWeight: 600 }}>
+              Use these tools to manually trigger the pop-ups and test your chroma-key video settings.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <button onClick={() => emit('test-alert-event', { percentage: 20, is_critical: false })} 
+                className="text-btn" style={{ background: 'var(--accent-orange)' }}>
+                Test Low Battery Popup
+              </button>
+              
+              <button onClick={() => emit('test-alert-event', { percentage: 5, is_critical: true })} 
+                className="text-btn" style={{ background: 'var(--accent-red)' }}>
+                Test Critical Battery Popup
+              </button>
             </div>
           </div>
         </div>
