@@ -38,8 +38,12 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_aptabase::Builder::new("A-US-1652133515").build())
+        .plugin(tauri_plugin_process::init())
         .manage(Mutex::new(rules::CooldownState::new()))
         .setup(|app| {
+            #[cfg(desktop)]
+            let _ = app.handle().plugin(tauri_plugin_updater::Builder::new().build());
             #[cfg(target_os = "macos")]
             let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             

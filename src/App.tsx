@@ -6,7 +6,8 @@ import { CustomizationPanel } from './components/CustomizationPanel';
 import { BatteryMonitor } from './components/BatteryMonitor';
 import { ChargingControl } from './components/ChargingControl';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
-import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug } from 'lucide-react';
+import { trackEvent } from '@aptabase/tauri';
+import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2 } from 'lucide-react';
 import './App.css';
 
 type ViewState = 'dashboard' | 'battery_monitor' | 'charging_control' | 'customization' | 'settings';
@@ -17,6 +18,18 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Initialize App and check onboarding
+  useEffect(() => {
+    trackEvent('app_launched', { version: '0.1.0', os: 'macos' });
+    trackEvent('daily_active', { date: new Date().toISOString().split('T')[0] });
+
+    const hasOnboarded = localStorage.getItem('casyuk_onboarded');
+    if (!hasOnboarded) {
+      setShowOnboarding(true);
+    }
+  }, []);
 
   // Toggle Theme
   useEffect(() => {
@@ -177,7 +190,7 @@ function App() {
     if (currentView === 'battery_monitor') {
       return <BatteryMonitor battery={battery} />;
     }
-    
+
     if (currentView === 'charging_control') {
       return <ChargingControl battery={battery} />;
     }
@@ -190,6 +203,32 @@ function App() {
       return <SettingsPanel />;
     }
   };
+
+  // Render Onboarding
+  if (showOnboarding) {
+    return (
+      <div className="onboarding-container">
+        <div className="onboarding-content">
+          <h1 style={{ fontSize: '3.5rem', marginBottom: '1rem', color: 'var(--text-main)', letterSpacing: '-1px' }}>Welcome to CasYuk 🔋</h1>
+          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', maxWidth: '600px', marginBottom: '3rem', lineHeight: '1.6' }}>
+            CasYuk uses emotional green-screen videos to remind you when it's time to charge.
+            To make this work, we need your permission to show notifications.
+          </p>
+          <button
+            onClick={async () => {
+              await requestPermission();
+              localStorage.setItem('casyuk_onboarded', 'true');
+              setShowOnboarding(false);
+              trackEvent('onboarding_completed');
+            }}
+            className="onboarding-btn"
+          >
+            <CheckCircle2 size={24} /> <span>Grant Permission & Start</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`app-layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
@@ -214,7 +253,7 @@ function App() {
           >
             <span className="icon"><LayoutDashboard size={18} /></span> {isSidebarOpen && 'Dashboard'}
           </button>
-          
+
           <div style={{ height: '1.5rem' }}></div>
           {isSidebarOpen && <p className="menu-label">Hardware</p>}
           <button
