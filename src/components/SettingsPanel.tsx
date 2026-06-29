@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { load } from '@tauri-apps/plugin-store';
-import { emit } from '@tauri-apps/api/event';
 import { Settings } from 'lucide-react';
 
 const BatterySlider = ({ value, onChange, min, max, color }: { value: number, onChange: (v: number) => void, min: number, max: number, color: string }) => {
