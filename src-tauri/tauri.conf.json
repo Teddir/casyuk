@@ -37,10 +37,6 @@
         "enable": true,
         "scope": ["**"]
       }
-    },
-    "trayIcon": {
-      "iconPath": "icons/32x32.png",
-      "tooltip": "CasYuk 🔋"
     }
   },
   "bundle": {

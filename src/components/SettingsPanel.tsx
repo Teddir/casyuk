@@ -30,7 +30,7 @@ const BatterySlider = ({ value, onChange, min, max, color }: { value: number, on
 
 export function SettingsPanel() {
   const [lowThreshold, setLowThreshold] = useState(20);
-  const [criticalThreshold, setCriticalThreshold] = useState(5);
+  const [criticalThreshold, setCriticalThreshold] = useState(10);
   const [store, setStore] = useState<any>(null);
   const [hasUnsaved, setHasUnsaved] = useState(false);
 
@@ -58,6 +58,12 @@ export function SettingsPanel() {
     setHasUnsaved(true);
   };
 
+  const resetThresholds = () => {
+    setLowThreshold(20);
+    setCriticalThreshold(10);
+    setHasUnsaved(true);
+  };
+
   const saveSettings = async () => {
     if (store) {
       await store.set('low_threshold', { value: lowThreshold });
@@ -79,6 +85,22 @@ export function SettingsPanel() {
         <div className="widget-card">
           <div className="widget-header">
             <h3>Notification Thresholds</h3>
+            <button 
+              onClick={resetThresholds} 
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-color)',
+                borderRadius: '4px',
+                padding: '0.2rem 0.5rem',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                color: 'var(--text-main)',
+                boxShadow: '1px 1px 0px var(--border-color)'
+              }}
+            >
+              Reset Default
+            </button>
           </div>
           <div className="widget-content">
             <div style={{ marginBottom: '2rem' }}>

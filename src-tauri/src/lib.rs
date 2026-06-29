@@ -40,6 +40,9 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(Mutex::new(rules::CooldownState::new()))
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            
             tray::create_tray(app.handle())?;
             rules::start_rule_engine(app.handle().clone());
             Ok(())
@@ -49,7 +52,7 @@ pub fn run() {
                 if window.is_fullscreen().unwrap_or(false) {
                     let _ = window.set_fullscreen(false);
                 }
-                window.hide().unwrap();
+                let _ = window.hide();
                 api.prevent_close();
             }
             _ => {}
@@ -70,6 +73,10 @@ pub fn run() {
                         let _ = window.show();
                         let _ = window.set_focus();
                     }
+                }
+                tauri::RunEvent::ExitRequested { api, .. } => {
+                    // Prevent exit on Cmd+Q or Dock Quit so it runs in background
+                    api.prevent_exit();
                 }
                 _ => {}
             }

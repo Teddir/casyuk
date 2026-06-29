@@ -20,18 +20,22 @@ pub fn start_rule_engine(app: AppHandle) {
             
             if let Ok(battery) = crate::battery::get_status() {
                 let mut low_threshold = 20;
-                let mut critical_threshold = 5;
+                let mut critical_threshold = 10;
                 
                 // Try to read settings from store
                 if let Ok(store) = app.store("settings.json") {
-                    if let Some(val) = store.get("lowThreshold") {
-                        if let Some(num) = val.as_u64() {
-                            low_threshold = num as u8;
+                    if let Some(val) = store.get("low_threshold") {
+                        if let Some(obj) = val.as_object() {
+                            if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+                                low_threshold = num as u8;
+                            }
                         }
                     }
-                    if let Some(val) = store.get("criticalThreshold") {
-                        if let Some(num) = val.as_u64() {
-                            critical_threshold = num as u8;
+                    if let Some(val) = store.get("critical_threshold") {
+                        if let Some(obj) = val.as_object() {
+                            if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+                                critical_threshold = num as u8;
+                            }
                         }
                     }
                 }

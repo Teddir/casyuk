@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { getCurrentWindow } from '@tauri-apps/api/window';
-import { sendNotification } from '@tauri-apps/plugin-notification';
+import { sendNotification, isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification';
 import { load } from '@tauri-apps/plugin-store';
 import { AlertOverlay } from './components/AlertOverlay';
 import { convertFileSrc } from '@tauri-apps/api/core';
@@ -16,6 +16,21 @@ export function AlertWindow() {
   const [activeAlert, setActiveAlert] = useState<AlertData | null>(null);
   const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null);
   const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
+
+  const safeSendNotification = async (title: string, body: string) => {
+    try {
+      let permissionGranted = await isPermissionGranted();
+      if (!permissionGranted) {
+        const permission = await requestPermission();
+        permissionGranted = permission === 'granted';
+      }
+      if (permissionGranted) {
+        sendNotification({ title, body });
+      }
+    } catch (e) {
+      console.error('Failed to send notification', e);
+    }
+  };
 
   useEffect(() => {
     async function loadSettings() {
@@ -53,10 +68,10 @@ export function AlertWindow() {
         await appWindow.show();
         await appWindow.setFocus();
         
-        sendNotification({
-          title: payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
-          body: `Battery is at ${payload.percentage}%`
-        });
+        await safeSendNotification(
+          payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
+          `Battery is at ${payload.percentage}%`
+        );
       } catch (e) {
         console.error('Failed to parse alert payload', e);
       }
@@ -71,10 +86,10 @@ export function AlertWindow() {
       await appWindow.show();
       await appWindow.setFocus();
       
-      sendNotification({
-        title: event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
-        body: `Battery is at ${event.payload.percentage}%`
-      });
+      await safeSendNotification(
+        event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
+        `Battery is at ${event.payload.percentage}%`
+      );
     });
 
     return () => {
