@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { load } from '@tauri-apps/plugin-store';
-import { Settings } from 'lucide-react';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
+import { Settings, RefreshCw, DownloadCloud } from 'lucide-react';
 
 const BatterySlider = ({ value, onChange, min, max, color }: { value: number, onChange: (v: number) => void, min: number, max: number, color: string }) => {
   return (
@@ -33,6 +35,10 @@ export function SettingsPanel() {
   const [criticalThreshold, setCriticalThreshold] = useState(10);
   const [store, setStore] = useState<any>(null);
   const [hasUnsaved, setHasUnsaved] = useState(false);
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState<any>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<string>('');
 
   useEffect(() => {
     async function initStore() {
@@ -141,6 +147,113 @@ export function SettingsPanel() {
 
         <div className="widget-card">
           <div className="widget-header">
+            <h3>App Updates</h3>
+          </div>
+          <div className="widget-content">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div>
+                <p style={{ fontWeight: 700, margin: 0 }}>Current Version</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>v{import.meta.env.VITE_APP_VERSION || '1.0.0'}</p>
+              </div>
+              
+              {!updateAvailable ? (
+                <button 
+                  className="text-btn" 
+                  onClick={async () => {
+                    try {
+                      setIsCheckingUpdate(true);
+                      setUpdateStatus('Checking for updates...');
+                      const update = await check();
+                      if (update) {
+                        setUpdateAvailable(update);
+                        setUpdateStatus(`Update v${update.version} available!`);
+                      } else {
+                        setUpdateStatus('You are up to date!');
+                        setTimeout(() => setUpdateStatus(''), 3000);
+                      }
+                    } catch (error: any) {
+                      setUpdateStatus(`Error: ${error.message || 'Failed to check'}`);
+                      setTimeout(() => setUpdateStatus(''), 3000);
+                    } finally {
+                      setIsCheckingUpdate(false);
+                    }
+                  }}
+                  disabled={isCheckingUpdate}
+                  style={{ 
+                    padding: '0.6rem 1.2rem', 
+                    background: 'var(--border-color)',
+                    color: 'var(--primary-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <RefreshCw size={16} className={isCheckingUpdate ? 'spin-anim' : ''} />
+                  {isCheckingUpdate ? 'Checking...' : 'Check Update'}
+                </button>
+              ) : (
+                <button 
+                  className="text-btn" 
+                  onClick={async () => {
+                    try {
+                      setIsDownloading(true);
+                      setUpdateStatus('Downloading and installing update...');
+                      let downloaded = 0;
+                      let contentLength = 0;
+                      await updateAvailable.downloadAndInstall((event: any) => {
+                        switch (event.event) {
+                          case 'Started':
+                            contentLength = event.data.contentLength;
+                            break;
+                          case 'Progress':
+                            downloaded += event.data.chunkLength;
+                            const progress = Math.round((downloaded / contentLength) * 100);
+                            setUpdateStatus(`Downloading: ${progress}%`);
+                            break;
+                          case 'Finished':
+                            setUpdateStatus('Installing...');
+                            break;
+                        }
+                      });
+                      setUpdateStatus('Update installed! Restarting...');
+                      setTimeout(() => relaunch(), 1500);
+                    } catch (error: any) {
+                      setUpdateStatus(`Install failed: ${error.message}`);
+                      setIsDownloading(false);
+                    }
+                  }}
+                  disabled={isDownloading}
+                  style={{ 
+                    padding: '0.6rem 1.2rem', 
+                    background: 'var(--accent-green)',
+                    color: '#000',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <DownloadCloud size={16} />
+                  {isDownloading ? 'Downloading...' : 'Install Update'}
+                </button>
+              )}
+            </div>
+            
+            {updateStatus && (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: 0, fontWeight: 600, padding: '0.5rem', background: 'var(--sidebar-bg)', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+                ℹ️ {updateStatus}
+              </p>
+            )}
+            {updateAvailable && updateAvailable.body && (
+              <div style={{ marginTop: '1rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'var(--sidebar-bg)' }}>
+                <p style={{ fontWeight: 700, margin: '0 0 0.5rem 0', fontSize: '0.9rem' }}>Release Notes (v{updateAvailable.version}):</p>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{updateAvailable.body}</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="widget-card">
+          <div className="widget-header">
             <h3>Save Configuration</h3>
           </div>
           <div className="widget-content">
@@ -155,7 +268,7 @@ export function SettingsPanel() {
                 width: '100%', 
                 padding: '1rem', 
                 background: hasUnsaved ? 'var(--accent-green)' : 'var(--border-color)',
-                color: hasUnsaved ? 'var(--bg-main)' : 'var(--text-muted)'
+                color: hasUnsaved ? '#000000' : 'var(--primary-color)'
               }}
             >
               {hasUnsaved ? 'Save Settings' : 'Saved'}

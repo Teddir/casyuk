@@ -45,7 +45,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI0MUExOTc4NkQyMkU1MTYKUldRVzVTSnRlQmthSkppSkNDQ0lSY1RpdG1lSjlISEFKaCtoSTd5SWxvYXBSRHhIQnFVaVlTa3oK",
       "endpoints": [
-        "https://github.com/YOUR_USER/casyuk/releases/latest/download/latest.json"
+        "https://github.com/Teddir/casyuk/releases/latest/download/latest.json"
       ]
     }
   },
