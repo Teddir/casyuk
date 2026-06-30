@@ -8,6 +8,8 @@ import { ChargingControl } from './components/ChargingControl';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { trackEvent } from '@aptabase/tauri';
 import { getVersion } from '@tauri-apps/api/app';
+import { check } from '@tauri-apps/plugin-updater';
+import { relaunch } from '@tauri-apps/plugin-process';
 import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2 } from 'lucide-react';
 import './App.css';
 
@@ -24,14 +26,45 @@ function App() {
 
   // Initialize App and check onboarding
   useEffect(() => {
-    getVersion().then(setAppVersion).catch(console.error);
-    trackEvent('app_launched', { version: appVersion, os: 'macos' });
+    getVersion().then((ver) => {
+      setAppVersion(ver);
+      trackEvent('app_launched', { version: ver, os: 'macos' });
+    }).catch(console.error);
+    
     trackEvent('daily_active', { date: new Date().toISOString().split('T')[0] });
 
     const hasOnboarded = localStorage.getItem('casyuk_onboarded');
     if (!hasOnboarded) {
       setShowOnboarding(true);
     }
+  }, []);
+
+  // Silent Auto-Updater (Runs on startup & every 12 hours)
+  useEffect(() => {
+    const runSilentUpdater = async () => {
+      try {
+        const update = await check();
+        if (update) {
+          trackEvent('auto_update_started', { version: update.version });
+          await update.downloadAndInstall();
+          trackEvent('auto_update_success', { version: update.version });
+          await relaunch();
+        }
+      } catch (err) {
+        console.error("Silent auto-update failed:", err);
+      }
+    };
+
+    // Delay the initial check slightly to avoid slowing down startup
+    const initialTimer = setTimeout(runSilentUpdater, 5000);
+    
+    // Check every 12 hours
+    const intervalId = setInterval(runSilentUpdater, 12 * 60 * 60 * 1000);
+    
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalId);
+    };
   }, []);
 
   // Toggle Theme
