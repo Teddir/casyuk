@@ -6,12 +6,21 @@ import { CustomizationPanel } from './components/CustomizationPanel';
 import { BatteryMonitor } from './components/BatteryMonitor';
 import { ChargingControl } from './components/ChargingControl';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
-import { trackEvent } from '@aptabase/tauri';
+import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2 } from 'lucide-react';
 import './App.css';
+
+// Helper function to track events via Tauri v2 IPC
+const trackEvent = async (name: string, props?: Record<string, string | number | boolean>) => {
+  try {
+    await invoke('plugin:aptabase|track_event', { name, props });
+  } catch (err) {
+    console.error('Aptabase error:', err);
+  }
+};
 
 type ViewState = 'dashboard' | 'battery_monitor' | 'charging_control' | 'customization' | 'settings';
 

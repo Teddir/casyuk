@@ -26,6 +26,7 @@
     "updater:allow-download-and-install",
     "process:default",
     "process:allow-restart",
-    "aptabase:default"
+    "aptabase:default",
+    "aptabase:allow-track-event"
   ]
 }
