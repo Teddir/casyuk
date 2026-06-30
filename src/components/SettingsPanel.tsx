@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { load } from '@tauri-apps/plugin-store';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { getVersion } from '@tauri-apps/api/app';
 import { Settings, RefreshCw, DownloadCloud } from 'lucide-react';
 
 const BatterySlider = ({ value, onChange, min, max, color }: { value: number, onChange: (v: number) => void, min: number, max: number, color: string }) => {
@@ -39,8 +40,11 @@ export function SettingsPanel() {
   const [updateAvailable, setUpdateAvailable] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<string>('');
+  const [appVersion, setAppVersion] = useState('...');
 
   useEffect(() => {
+    getVersion().then(setAppVersion).catch(console.error);
+    
     async function initStore() {
       const s = await load('settings.json');
       setStore(s);
@@ -153,7 +157,7 @@ export function SettingsPanel() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
               <div>
                 <p style={{ fontWeight: 700, margin: 0 }}>Current Version</p>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>v{import.meta.env.VITE_APP_VERSION || '1.0.0'}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, margin: 0 }}>v{appVersion}</p>
               </div>
               
               {!updateAvailable ? (

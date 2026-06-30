@@ -7,6 +7,7 @@ import { BatteryMonitor } from './components/BatteryMonitor';
 import { ChargingControl } from './components/ChargingControl';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
 import { trackEvent } from '@aptabase/tauri';
+import { getVersion } from '@tauri-apps/api/app';
 import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2 } from 'lucide-react';
 import './App.css';
 
@@ -19,10 +20,12 @@ function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [searchQuery, setSearchQuery] = useState('');
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [appVersion, setAppVersion] = useState('...');
 
   // Initialize App and check onboarding
   useEffect(() => {
-    trackEvent('app_launched', { version: '0.1.0', os: 'macos' });
+    getVersion().then(setAppVersion).catch(console.error);
+    trackEvent('app_launched', { version: appVersion, os: 'macos' });
     trackEvent('daily_active', { date: new Date().toISOString().split('T')[0] });
 
     const hasOnboarded = localStorage.getItem('casyuk_onboarded');
@@ -295,7 +298,7 @@ function App() {
             {isSidebarOpen && (
               <div className="user-info">
                 <p className="name" title="CasYuk System">CasYuk System</p>
-                <p className="email" title={`v${import.meta.env.VITE_APP_VERSION || '1.0.0'}-pro`}>v{import.meta.env.VITE_APP_VERSION || '1.0.0'}-pro</p>
+                <p className="email" title={`v${appVersion}-pro`}>v{appVersion}-pro</p>
               </div>
             )}
           </div>
