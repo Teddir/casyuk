@@ -4,7 +4,6 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { emit } from '@tauri-apps/api/event';
 import { Palette, RotateCcw, Save, Music } from 'lucide-react';
-import mascotVideo from '../assets/mascot/0629.mp4';
 
 export function CustomizationPanel() {
   const [store, setStore] = useState<any>(null);
@@ -109,31 +108,22 @@ export function CustomizationPanel() {
       </div>
       
       <div className="widgets-row">
-        <div className="widget-card">
+        <div className="widget-card" style={{ gridColumn: '1 / -1' }}>
           <div className="widget-header">
-            <h3>Video Background</h3>
+            <h3>🎬 Custom Green-Screen Upload <span style={{ background: 'var(--accent-green)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', marginLeft: '10px', color: '#000' }}>PRO</span></h3>
           </div>
           <div className="widget-content">
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Default or Custom Video</label>
-            <div className="neo-card" style={{ padding: '0.5rem', marginBottom: '1.5rem', background: '#000', display: 'flex', justifyContent: 'center', borderRadius: '12px' }}>
-              <video 
-                key={customVideoPath || 'default-vid'}
-                src={customVideoPath ? convertFileSrc(customVideoPath) : mascotVideo} 
-                autoPlay loop muted 
-                style={{ width: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }} 
-              />
-            </div>
-            
+            <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>Upload your own custom green-screen video to use as an alert.</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <input 
                 type="text" 
                 readOnly 
-                value={customVideoPath ? customVideoPath.split('/').pop() : 'Default (0629.mp4)'} 
+                value={customVideoPath && !customVideoPath.startsWith('http') ? customVideoPath.split('/').pop() : 'No custom file selected'} 
                 style={{ flex: 1, padding: '0.8rem', fontWeight: 600, boxSizing: 'border-box' }} 
-                title={customVideoPath || 'Default Video'}
+                title={customVideoPath || 'Custom Video'}
               />
               <button onClick={handlePickVideo} className="text-btn" style={{ background: 'var(--accent-blue)', flexShrink: 0 }}>
-                Browse...
+                Browse Local File...
               </button>
             </div>
           </div>
@@ -185,8 +175,15 @@ export function CustomizationPanel() {
                 <input 
                   type="checkbox" 
                   checked={showGlassCard} 
-                  onChange={(e) => setShowGlassCard(e.target.checked)} 
-                  style={{ width: '24px', height: '24px', accentColor: 'var(--text-main)' }} 
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    setShowGlassCard(checked);
+                    if (store) {
+                      await store.set('show_glass_card', { value: checked });
+                      await store.save();
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
                 />
               </label>
             </div>
@@ -234,12 +231,12 @@ export function CustomizationPanel() {
             </p>
             
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button onClick={() => emit('test-alert-event', { percentage: 20, is_critical: false })} 
+              <button onClick={() => emit('test-alert-event', { percentage: 20, is_critical: false, is_test: true })} 
                 className="text-btn" style={{ background: 'var(--accent-orange)' }}>
                 Test Low Battery Popup
               </button>
               
-              <button onClick={() => emit('test-alert-event', { percentage: 5, is_critical: true })} 
+              <button onClick={() => emit('test-alert-event', { percentage: 5, is_critical: true, is_test: true })} 
                 className="text-btn" style={{ background: 'var(--accent-red)' }}>
                 Test Critical Battery Popup
               </button>

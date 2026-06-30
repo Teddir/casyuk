@@ -3,6 +3,7 @@ import { useBattery } from './hooks/useBattery';
 import { BatteryGauge } from './components/BatteryGauge';
 import { SettingsPanel } from './components/SettingsPanel';
 import { CustomizationPanel } from './components/CustomizationPanel';
+import { VideoBank } from './components/VideoBank';
 import { BatteryMonitor } from './components/BatteryMonitor';
 import { ChargingControl } from './components/ChargingControl';
 import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
@@ -10,7 +11,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
-import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film } from 'lucide-react';
 import './App.css';
 
 // Helper function to track events via Tauri v2 IPC
@@ -22,7 +23,7 @@ const trackEvent = async (name: string, props?: Record<string, string | number |
   }
 };
 
-type ViewState = 'dashboard' | 'battery_monitor' | 'charging_control' | 'customization' | 'settings';
+type ViewState = 'dashboard' | 'video_bank' | 'battery_monitor' | 'charging_control' | 'customization' | 'settings';
 
 function App() {
   const { battery, error } = useBattery(5000);
@@ -232,6 +233,10 @@ function App() {
       );
     }
 
+    if (currentView === 'video_bank') {
+      return <VideoBank />;
+    }
+
     if (currentView === 'battery_monitor') {
       return <BatteryMonitor battery={battery} />;
     }
@@ -319,6 +324,13 @@ function App() {
           <div style={{ height: '1.5rem' }}></div>
           {isSidebarOpen && <p className="menu-label">Preferences</p>}
           <button
+            className={`menu-item ${currentView === 'video_bank' ? 'active' : ''}`}
+            onClick={() => setCurrentView('video_bank')}
+            title="Video Bank"
+          >
+            <span className="icon"><Film size={18} /></span> {isSidebarOpen && <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Video Bank <span style={{ background: 'var(--accent-green)', color: '#000', padding: '1px 6px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 'bold' }}>PRO</span></span>}
+          </button>
+          <button
             className={`menu-item ${currentView === 'customization' ? 'active' : ''}`}
             onClick={() => setCurrentView('customization')}
             title="Customization"
@@ -358,6 +370,7 @@ function App() {
             )}
             <h1>
               {currentView === 'dashboard' && 'Battery Overview'}
+              {currentView === 'video_bank' && 'Video Bank PRO'}
               {currentView === 'battery_monitor' && 'Hardware Metrics'}
               {currentView === 'charging_control' && 'Power Management'}
               {currentView === 'customization' && 'Appearance'}

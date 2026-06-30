@@ -7,7 +7,9 @@ const isAlertWindow = window.location.search.includes('window=alert');
 
 if (isAlertWindow) {
   document.body.style.backgroundColor = 'transparent';
+  document.body.style.backgroundImage = 'none';
   document.documentElement.style.backgroundColor = 'transparent';
+  document.documentElement.style.backgroundImage = 'none';
   document.body.style.overflow = 'hidden';
 }
 
