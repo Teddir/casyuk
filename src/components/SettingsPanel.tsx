@@ -176,8 +176,9 @@ export function SettingsPanel() {
                         setTimeout(() => setUpdateStatus(''), 3000);
                       }
                     } catch (error: any) {
-                      setUpdateStatus(`Error: ${error.message || 'Failed to check'}`);
-                      setTimeout(() => setUpdateStatus(''), 3000);
+                      const errMsg = typeof error === 'string' ? error : (error.message || 'Failed to check');
+                      setUpdateStatus(`Error: ${errMsg}`);
+                      setTimeout(() => setUpdateStatus(''), 8000);
                     } finally {
                       setIsCheckingUpdate(false);
                     }
