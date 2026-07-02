@@ -109,9 +109,9 @@ CasYuk is an open-source project maintained by a passionate team. If CasYuk has 
 
 Your donations help us cover Apple Developer Program fees, server costs for Video Bank hosting, and open-source bounties.
 
-*   ☕ **[Buy us a Coffee](https://buymeacoffee.com/casyuk)**
-*   💖 **[GitHub Sponsors](https://github.com/sponsors/Teddir)**
-*   💳 **[Patreon](https://patreon.com/casyuk)**
+*   ☕ **[Buy us a Coffee](https://buymeacoffee.com/Teddir)**
+<!-- *   💖 **[GitHub Sponsors](https://github.com/sponsors/Teddir)**
+*   💳 **[Patreon](https://patreon.com/casyuk)** -->
 
 **Enterprise Users:** Purchasing a **CasYuk Pro Lifetime License** via [Lemon Squeezy](https://casyuk.lemonsqueezy.com/buy/casyuk-pro) is the best way to support the project while unlocking advanced features.
 

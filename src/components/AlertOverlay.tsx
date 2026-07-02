@@ -11,9 +11,11 @@ interface AlertOverlayProps {
   onDismiss: () => void;
   customVideoUrl?: string | null;
   customAudioUrl?: string | null;
+  enableAudioAlert?: boolean;
+  enableVideoAudio?: boolean;
 }
 
-export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl: _customVideoUrl, customAudioUrl: _customAudioUrl }: AlertOverlayProps) {
+export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl: _customVideoUrl, customAudioUrl: _customAudioUrl, enableAudioAlert = true, enableVideoAudio = true }: AlertOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -26,10 +28,10 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
   const [cardVisible, setCardVisible] = useState(false);
 
   useEffect(() => {
-    // Delay the appearance of the Glassmorphism card by 2.5 seconds
+    // Delay the appearance of the Glassmorphism card by 3 seconds
     const timer = setTimeout(() => {
       setCardVisible(true);
-    }, 2500);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -86,14 +88,14 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
     const processFrame = (time: number) => {
       // Always request next frame
       animationFrameId = requestAnimationFrame(processFrame);
-      
+
       if (video.paused || video.ended) return;
 
       // Throttle frame rate
       const elapsed = time - lastTime;
       if (elapsed < fpsInterval) return;
       lastTime = time - (elapsed % fpsInterval);
-      
+
       // Downscale by 2x (processes 4x fewer pixels) for extreme performance gain
       const targetWidth = Math.floor(video.videoWidth / 2);
       const targetHeight = Math.floor(video.videoHeight / 2);
@@ -176,7 +178,7 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
         src={videoUrl || mascotVideo}
         autoPlay
         loop
-        muted
+        muted={!enableVideoAudio}
         playsInline
         style={{ display: 'none' }}
         onError={() => {
@@ -188,12 +190,12 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
       />
 
       {/* Background Audio */}
-      {audioUrl && (
-        <audio 
-          src={audioUrl} 
-          autoPlay 
-          loop 
-          style={{ display: 'none' }} 
+      {enableAudioAlert && audioUrl && (
+        <audio
+          src={audioUrl}
+          autoPlay
+          loop
+          style={{ display: 'none' }}
           onError={() => {
             console.error("Failed to load custom audio, falling back to silent");
             setAudioUrl(null);
@@ -218,11 +220,11 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
 
       {/* Glassmorphism Card */}
       {showGlassCard && (
-        <div 
-          className="glass-card" 
-          style={{ 
-            position: 'relative', 
-            zIndex: 100, 
+        <div
+          className="glass-card"
+          style={{
+            position: 'relative',
+            zIndex: 100,
             backgroundColor: 'rgba(0,0,0,0.7)',
             animation: 'none',
             opacity: cardVisible ? 1 : 0,

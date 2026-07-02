@@ -23,6 +23,11 @@ export function CustomizationPanel({ isPro = false, onUpgradeClick }: Customizat
   const [cardTitle, setCardTitle] = useState('WARNING!');
   const [cardMessage, setCardMessage] = useState('Battery level is critically low. Please plug in your charger immediately to prevent data loss.');
 
+  // Preferences State
+  const [enableSystemNotification, setEnableSystemNotification] = useState(false);
+  const [enableAudioAlert, setEnableAudioAlert] = useState(true);
+  const [enableVideoAudio, setEnableVideoAudio] = useState(true);
+
   // File Validation State
   const [videoFileError, setVideoFileError] = useState(false);
   const [audioFileError, setAudioFileError] = useState(false);
@@ -37,12 +42,20 @@ export function CustomizationPanel({ isPro = false, onUpgradeClick }: Customizat
       const savedShowCard = await s.get<{ value: boolean }>('show_glass_card');
       const savedTitle = await s.get<{ value: string }>('card_title');
       const savedMessage = await s.get<{ value: string }>('card_message');
+      
+      const savedSysNotif = await s.get<{ value: boolean }>('enable_system_notification');
+      const savedAudioAlert = await s.get<{ value: boolean }>('enable_audio_alert');
+      const savedVideoAudio = await s.get<{ value: boolean }>('enable_video_audio');
 
       if (savedVid) setCustomVideoPath(savedVid.value);
       if (savedAud) setCustomAudioPath(savedAud.value);
       if (savedShowCard !== null && savedShowCard !== undefined) setShowGlassCard(savedShowCard.value);
       if (savedTitle) setCardTitle(savedTitle.value);
       if (savedMessage) setCardMessage(savedMessage.value);
+      
+      setEnableSystemNotification(savedSysNotif ? savedSysNotif.value : false);
+      setEnableAudioAlert(savedAudioAlert ? savedAudioAlert.value : true);
+      setEnableVideoAudio(savedVideoAudio ? savedVideoAudio.value : true);
     }
     initStore();
   }, []);
@@ -158,6 +171,103 @@ export function CustomizationPanel({ isPro = false, onUpgradeClick }: Customizat
         </div>
       </div>
 
+      <div className="widgets-row" style={{ marginBottom: '2.5rem' }}>
+        <div className="widget-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="widget-header">
+            <h3>General Preferences</h3>
+          </div>
+          <div className="widget-content">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-color)' }}>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.2rem' }}>System OS Notification</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Show standard OS popup alerts (disabled by default to focus on overlay)</span>
+              </div>
+              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={enableSystemNotification} 
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    setEnableSystemNotification(checked);
+                    if (store) {
+                      await store.set('enable_system_notification', { value: checked });
+                      await store.save();
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
+                />
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-color)' }}>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Show Alert Card</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Display text over the video</span>
+              </div>
+              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={showGlassCard} 
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    setShowGlassCard(checked);
+                    if (store) {
+                      await store.set('show_glass_card', { value: checked });
+                      await store.save();
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
+                />
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-color)' }}>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Video Audio</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Play original sound from the green-screen video</span>
+              </div>
+              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={enableVideoAudio} 
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    setEnableVideoAudio(checked);
+                    if (store) {
+                      await store.set('enable_video_audio', { value: checked });
+                      await store.save();
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
+                />
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Custom Audio Alerts</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Play the MP3/WAV file from the Custom Audio section</span>
+              </div>
+              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={enableAudioAlert} 
+                  onChange={async (e) => {
+                    const checked = e.target.checked;
+                    setEnableAudioAlert(checked);
+                    if (store) {
+                      await store.set('enable_audio_alert', { value: checked });
+                      await store.save();
+                    }
+                  }}
+                  style={{ width: '20px', height: '20px', cursor: 'pointer' }} 
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="widgets-row">
         <div className="widget-card" style={{ gridColumn: '1 / -1' }}>
           <div className="widget-header">
@@ -255,28 +365,6 @@ export function CustomizationPanel({ isPro = false, onUpgradeClick }: Customizat
             </div>
           </div>
           <div className="widget-content">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-color)' }}>
-              <div>
-                <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Show Alert Card</strong>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Display text over the video</span>
-              </div>
-              <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={showGlassCard}
-                  onChange={async (e) => {
-                    const checked = e.target.checked;
-                    setShowGlassCard(checked);
-                    if (store) {
-                      await store.set('show_glass_card', { value: checked });
-                      await store.save();
-                    }
-                  }}
-                  style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                />
-              </label>
-            </div>
-
             <div style={{ opacity: showGlassCard ? 1 : 0.5, pointerEvents: showGlassCard ? 'auto' : 'none', transition: 'all 0.3s ease' }}>
               <div style={{ marginBottom: '1.5rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Alert Title</label>

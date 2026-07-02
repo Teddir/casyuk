@@ -19,6 +19,9 @@ export function AlertWindow() {
   const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null);
   const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
   const [activeVideoId, setActiveVideoId] = useState<string>('default');
+  const [enableSystemNotification, setEnableSystemNotification] = useState(false);
+  const [enableAudioAlert, setEnableAudioAlert] = useState(true);
+  const [enableVideoAudio, setEnableVideoAudio] = useState(true);
 
   const [isExiting, setIsExiting] = useState(false);
 
@@ -75,8 +78,15 @@ export function AlertWindow() {
         const savedVid = await store.get<{ value: string }>('custom_video_path');
         const savedAud = await store.get<{ value: string }>('custom_audio_path');
         const savedId = await store.get<{ value: string }>('custom_video_id');
+        const savedSysNotif = await store.get<{ value: boolean }>('enable_system_notification');
+        const savedAudio = await store.get<{ value: boolean }>('enable_audio_alert');
+        const savedVideoAudio = await store.get<{ value: boolean }>('enable_video_audio');
         
         setActiveVideoId(savedId?.value || 'default');
+        
+        setEnableSystemNotification(savedSysNotif ? savedSysNotif.value : false);
+        setEnableAudioAlert(savedAudio ? savedAudio.value : true);
+        setEnableVideoAudio(savedVideoAudio ? savedVideoAudio.value : true);
 
         if (savedVid && savedVid.value) {
           if (savedVid.value.startsWith('http')) {
@@ -119,10 +129,12 @@ export function AlertWindow() {
         await appWindow.show();
         await appWindow.setFocus();
 
-        await safeSendNotification(
-          payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
-          `Battery is at ${payload.percentage}%`
-        );
+        if (enableSystemNotification) {
+          await safeSendNotification(
+            payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
+            `Battery is at ${payload.percentage}%`
+          );
+        }
         
         invoke('plugin:aptabase|track_event', {
           name: 'alert_shown',
@@ -144,10 +156,12 @@ export function AlertWindow() {
       await appWindow.show();
       await appWindow.setFocus();
 
-      await safeSendNotification(
-        event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
-        `Battery is at ${event.payload.percentage}%`
-      );
+      if (enableSystemNotification) {
+        await safeSendNotification(
+          event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
+          `Battery is at ${event.payload.percentage}%`
+        );
+      }
 
       invoke('plugin:aptabase|track_event', {
         name: 'alert_shown',
@@ -189,6 +203,8 @@ export function AlertWindow() {
         onDismiss={handleDismiss}
         customVideoUrl={customVideoUrl}
         customAudioUrl={customAudioUrl}
+        enableAudioAlert={enableAudioAlert}
+        enableVideoAudio={enableVideoAudio}
       />
     </div>
   );
