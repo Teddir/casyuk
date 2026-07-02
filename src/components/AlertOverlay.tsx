@@ -79,53 +79,65 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
     if (!ctx) return;
 
     let animationFrameId: number;
+    let lastTime = 0;
+    const FPS = 24; // Cinematic 24fps cap cuts CPU load by 60% compared to 60fps
+    const fpsInterval = 1000 / FPS;
 
-    // Set canvas size to match window
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const processFrame = () => {
+    const processFrame = (time: number) => {
+      // Always request next frame
+      animationFrameId = requestAnimationFrame(processFrame);
+      
       if (video.paused || video.ended) return;
+
+      // Throttle frame rate
+      const elapsed = time - lastTime;
+      if (elapsed < fpsInterval) return;
+      lastTime = time - (elapsed % fpsInterval);
+      
+      // Downscale by 2x (processes 4x fewer pixels) for extreme performance gain
+      const targetWidth = Math.floor(video.videoWidth / 2);
+      const targetHeight = Math.floor(video.videoHeight / 2);
+
+      if (video.videoWidth > 0 && canvas.width !== targetWidth) {
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+      }
+
+      if (canvas.width === 0) return;
 
       try {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const length = frame.data.length;
+        const data = frame.data;
+        const length = data.length;
 
         // Chroma Key logic (Green Screen Removal)
         for (let i = 0; i < length; i += 4) {
-          const r = frame.data[i + 0];
-          const g = frame.data[i + 1];
-          const b = frame.data[i + 2];
+          const r = data[i + 0];
+          const g = data[i + 1];
+          const b = data[i + 2];
 
           // If pixel is green-dominant, make it transparent
           if (g > 100 && r < g * 0.8 && b < g * 0.8) {
-            frame.data[i + 3] = 0; // Alpha channel = 0 (Transparent)
+            data[i + 3] = 0; // Alpha channel = 0 (Transparent)
           }
         }
         ctx.putImageData(frame, 0, 0);
       } catch (err: any) {
         console.error(`Canvas Error: ${err.message}`);
-        // Stop animation if there's a permanent error (like CORS) to prevent log flooding
+        cancelAnimationFrame(animationFrameId);
         return;
       }
-      animationFrameId = requestAnimationFrame(processFrame);
     };
 
     const handlePlay = () => {
       cancelAnimationFrame(animationFrameId);
+      lastTime = performance.now();
       animationFrameId = requestAnimationFrame(processFrame);
     };
 
     video.addEventListener('play', handlePlay);
-
-    // Handle window resize
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    window.addEventListener('resize', handleResize);
 
     // If it's already playing
     if (!video.paused) {
@@ -135,7 +147,6 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
     return () => {
       cancelAnimationFrame(animationFrameId);
       video.removeEventListener('play', handlePlay);
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -168,11 +179,26 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
         muted
         playsInline
         style={{ display: 'none' }}
+        onError={() => {
+          if (videoUrl && videoUrl !== mascotVideo) {
+            console.error("Failed to load custom video, falling back to default mascot");
+            setVideoUrl(null); // Will fallback to mascotVideo via the src prop
+          }
+        }}
       />
 
       {/* Background Audio */}
       {audioUrl && (
-        <audio src={audioUrl} autoPlay loop style={{ display: 'none' }} />
+        <audio 
+          src={audioUrl} 
+          autoPlay 
+          loop 
+          style={{ display: 'none' }} 
+          onError={() => {
+            console.error("Failed to load custom audio, falling back to silent");
+            setAudioUrl(null);
+          }}
+        />
       )}
 
       {/* Processed Chroma Key Canvas */}
@@ -185,7 +211,8 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
           width: '100%',
           height: '100%',
           zIndex: -1,
-          opacity: 0.9
+          opacity: 0.9,
+          objectFit: 'cover'
         }}
       />
 

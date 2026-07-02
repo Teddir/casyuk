@@ -388,6 +388,41 @@ function App() {
             >
               <span className="icon"><Settings size={18} /></span> {isSidebarOpen && 'Settings'}
             </button>
+
+            <div style={{ height: '1.5rem' }}></div>
+            {!isPro ? (
+              <button
+                className="menu-item"
+                onClick={() => setShowLicenseModal(true)}
+                title="Upgrade to Pro"
+                style={{
+                  color: '#000', fontWeight: 'bold',
+                  border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)',
+                  marginTop: '1rem'
+                }}
+              >
+                <span className="icon"><Crown size={18} /></span> {isSidebarOpen && 'Upgrade to Pro'}
+              </button>
+            ) : (
+              <button
+                className="menu-item"
+                onClick={async () => {
+                  const store = await load('settings.json');
+                  await store.delete('is_pro_activated');
+                  await store.save();
+                  setIsPro(false);
+                  showToastMessage('Pro Plan Reset (Testing)');
+                }}
+                title="Downgrade to Free"
+                style={{
+                  color: '#000', fontWeight: 'bold',
+                  border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)',
+                  marginTop: '1rem'
+                }}
+              >
+                <span className="icon"><Crown size={18} /></span> {isSidebarOpen && 'Downgrade Plan'}
+              </button>
+            )}
           </div>
 
           <div className="sidebar-footer">
@@ -398,36 +433,6 @@ function App() {
                   <p className="name" title={isPro ? "CasYuk Pro" : "CasYuk"}>{isPro ? "CasYuk Pro" : "CasYuk"}</p>
                   <p className="email" title={`v${appVersion}${isPro ? '-pro' : '-free'}`}>v{appVersion}{isPro ? <span style={{ color: 'var(--accent-green)', fontWeight: 'bold' }}> PRO</span> : ''}</p>
                 </div>
-              )}
-              {!isPro && isSidebarOpen && (
-                <button
-                  onClick={() => setShowLicenseModal(true)}
-                  style={{
-                    marginLeft: 'auto', background: 'var(--accent-green)', color: '#000',
-                    border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem',
-                    fontWeight: 'bold', cursor: 'pointer'
-                  }}
-                >
-                  UPGRADE
-                </button>
-              )}
-              {isPro && isSidebarOpen && (
-                <button
-                  onClick={async () => {
-                    const store = await load('settings.json');
-                    await store.delete('is_pro_activated');
-                    await store.save();
-                    setIsPro(false);
-                    showToastMessage('Pro Plan Reset (Testing)');
-                  }}
-                  style={{
-                    marginLeft: 'auto', background: 'var(--accent-red)', color: '#fff',
-                    border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem',
-                    fontWeight: 'bold', cursor: 'pointer'
-                  }}
-                >
-                  RESET
-                </button>
               )}
             </div>
           </div>
