@@ -477,7 +477,7 @@ function App() {
 
               <div style={{ width: '2px', height: '24px', background: 'var(--border-color)', margin: '0 0.5rem', opacity: 0.5 }}></div>
 
-              <button className="icon-btn" onClick={() => openUrl('mailto:hello@casyuk.com')} title="Email Us"
+              <button className="icon-btn" onClick={() => openUrl('mailto:teddir.ads@gmail.com')} title="Email Us"
                 style={{ background: 'var(--primary-color)', border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)', color: 'var(--text-main)' }}
               >
                 <Mail size={18} />
