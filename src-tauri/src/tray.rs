@@ -9,13 +9,23 @@ pub fn create_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
     let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&show_i, &quit_i])?;
 
+    let tray_bytes = include_bytes!("../icons/tray.png");
+    let img = image::load_from_memory(tray_bytes).expect("Failed to load tray icon memory").to_rgba8();
+    let (width, height) = img.dimensions();
+    let icon_image = tauri::image::Image::new_owned(img.into_raw(), width, height);
+
     TrayIconBuilder::new()
         .tooltip("CasYuk 🔋")
-        .icon(app.default_window_icon().unwrap().clone())
+        .icon(icon_image)
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
             "show" => {
                 if let Some(window) = app.get_webview_window("main") {
+                    #[cfg(target_os = "macos")]
+                    {
+                        let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
+                        let _ = app.show();
+                    }
                     let _ = window.show();
                     let _ = window.set_focus();
                 }
@@ -34,6 +44,11 @@ pub fn create_tray(app: &AppHandle) -> Result<(), Box<dyn std::error::Error>> {
             {
                 let app = tray.app_handle();
                 if let Some(window) = app.get_webview_window("main") {
+                    #[cfg(target_os = "macos")]
+                    {
+                        let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
+                        let _ = app.show();
+                    }
                     let _ = window.show();
                     let _ = window.set_focus();
                 }

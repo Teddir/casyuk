@@ -104,8 +104,8 @@ pub fn run() {
             #[cfg(desktop)]
             let _ = app.handle().plugin(tauri_plugin_updater::Builder::new().build());
             #[cfg(target_os = "macos")]
-            let _ = app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-            
+            let _ = app.set_activation_policy(tauri::ActivationPolicy::Regular);
+
             tray::create_tray(app.handle())?;
             rules::start_rule_engine(app.handle().clone());
             Ok(())
@@ -116,6 +116,8 @@ pub fn run() {
                     let _ = window.set_fullscreen(false);
                 }
                 let _ = window.hide();
+                #[cfg(target_os = "macos")]
+                let _ = window.app_handle().set_activation_policy(tauri::ActivationPolicy::Accessory);
                 api.prevent_close();
             }
             _ => {}
@@ -134,6 +136,11 @@ pub fn run() {
             match event {
                 tauri::RunEvent::Reopen { .. } => {
                     if let Some(window) = app_handle.get_webview_window("main") {
+                        #[cfg(target_os = "macos")]
+                        {
+                            let _ = app_handle.set_activation_policy(tauri::ActivationPolicy::Regular);
+                            let _ = app_handle.show();
+                        }
                         let _ = window.show();
                         let _ = window.set_focus();
                     }

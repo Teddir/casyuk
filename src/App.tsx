@@ -312,9 +312,9 @@ function App() {
     <div className={`app-layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       {/* Sidebar */}
       <aside className="sidebar">
-        <div className="brand">
+        <div className="brand" data-tauri-drag-region>
           <div className="brand-left">
-            <span className="brand-icon"><Zap size={24} color="#000" /></span>
+            <img src="/logo.png" alt="CasYuk Logo" className="brand-logo-img" />
             {isSidebarOpen && <h2>CasYuk</h2>}
           </div>
           <button className="collapse-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -419,7 +419,7 @@ function App() {
 
       {/* Main Content */}
       <main className="main-area">
-        <header className="topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1.5rem', background: 'var(--card-bg)', borderBottom: '2px solid var(--border-color)', height: '70px', zIndex: 10 }}>
+        <header className="topbar" data-tauri-drag-region>
           <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <button 
               className="icon-btn" 
@@ -439,7 +439,7 @@ function App() {
             </h1>
           </div>
 
-          <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div className="topbar-actions">
             {!isPro && (
               <button 
                 onClick={() => setShowLicenseModal(true)}
