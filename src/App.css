@@ -117,7 +117,7 @@ body {
   min-height: 60px;
   max-height: 60px;
   flex-shrink: 0;
-  padding: 0 1rem 0 74px;
+  padding: 0 1rem;
   border-bottom: 2px solid var(--border-color);
   width: 100%;
   box-sizing: border-box;
@@ -759,10 +759,6 @@ body {
     display: flex;
   }
 
-  .topbar {
-    padding-left: 74px; /* Prevents overlap with macOS traffic lights */
-  }
-
   .search-box {
     width: 100%;
     flex: 1;
@@ -885,6 +881,52 @@ body {
 }
 
 /* Toast Message */
+.update-badge {
+  background: var(--accent-red);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: bold;
+  border: 1px solid #000;
+}
+
+.announcement-bar {
+  background: var(--accent-purple);
+  color: #000;
+  border-bottom: 2px solid var(--border-color);
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee 25s linear infinite;
+  padding-left: 100%;
+  font-size: 0.85rem;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
 .toast {
   position: fixed;
   bottom: 2rem;
