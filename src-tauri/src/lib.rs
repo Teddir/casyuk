@@ -13,9 +13,15 @@ struct ValidateRequest {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+struct ActivateResponseMeta {
+    store_id: u64,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 struct ActivateResponse {
     activated: bool,
     error: Option<String>,
+    meta: Option<ActivateResponseMeta>,
 }
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -66,6 +72,15 @@ async fn validate_license(key: String, instance_name: String) -> Result<bool, St
     if res.status().is_success() || res.status() == reqwest::StatusCode::NOT_FOUND || res.status() == reqwest::StatusCode::BAD_REQUEST {
         let json_res: ActivateResponse = res.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
         if json_res.activated {
+            // SECURITY CHECK: Verify this license belongs to OUR store
+            // TODO: Replace 12345 with your actual Lemon Squeezy Store ID
+            let expected_store_id: u64 = 12345; 
+            
+            if let Some(meta) = json_res.meta {
+                if meta.store_id != expected_store_id && expected_store_id != 12345 {
+                    return Err("Invalid license key for this product.".to_string());
+                }
+            }
             Ok(true)
         } else {
             Err(json_res.error.unwrap_or_else(|| "Failed to activate license key".to_string()))

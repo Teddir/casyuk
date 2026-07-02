@@ -461,7 +461,7 @@ dependencies = [
 
 [[package]]
 name = "casyuk"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "battery",
  "reqwest 0.13.4",

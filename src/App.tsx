@@ -12,7 +12,8 @@ import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { load } from '@tauri-apps/plugin-store';
-import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film } from 'lucide-react';
+import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, MessageCircle, Crown } from 'lucide-react';
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { LicenseModal } from './components/LicenseModal';
 import './App.css';
 
@@ -418,14 +419,17 @@ function App() {
 
       {/* Main Content */}
       <main className="main-area">
-        <header className="topbar">
-          <div className="topbar-left">
-            {!isSidebarOpen && (
-              <button className="mobile-menu-btn icon-btn" onClick={() => setIsSidebarOpen(true)}>
-                ☰
-              </button>
-            )}
-            <h1>
+        <header className="topbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 1.5rem', background: 'var(--card-bg)', borderBottom: '2px solid var(--border-color)', height: '70px', zIndex: 10 }}>
+          <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button 
+              className="icon-btn" 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              title="Toggle Sidebar"
+              style={{ background: 'var(--primary-color)', border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)', color: 'var(--text-main)' }}
+            >
+              <PanelLeft size={18} />
+            </button>
+            <h1 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>
               {currentView === 'dashboard' && 'Battery Overview'}
               {currentView === 'video_bank' && 'Video Bank PRO'}
               {currentView === 'battery_monitor' && 'Hardware Metrics'}
@@ -435,22 +439,40 @@ function App() {
             </h1>
           </div>
 
-          <div className="topbar-actions">
+          <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            {!isPro && (
+              <button 
+                onClick={() => setShowLicenseModal(true)}
+                style={{ 
+                  display: 'flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'var(--accent-green)', color: '#000', 
+                  border: '2px solid #000', padding: '8px 16px', borderRadius: '8px', 
+                  fontSize: '0.9rem', fontWeight: 'bold', cursor: 'pointer',
+                  boxShadow: '3px 3px 0px #000',
+                  transition: 'transform 0.1s',
+                }}
+                onMouseDown={(e) => { e.currentTarget.style.transform = 'translate(3px, 3px)'; e.currentTarget.style.boxShadow = '0px 0px 0px #000'; }}
+                onMouseUp={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '3px 3px 0px #000'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '3px 3px 0px #000'; }}
+              >
+                <Crown size={16} /> Get Pro
+              </button>
+            )}
+            
+            <div style={{ width: '2px', height: '24px', background: 'var(--border-color)', margin: '0 0.5rem', opacity: 0.5 }}></div>
+
+            <button className="icon-btn" onClick={() => openUrl('https://discord.gg/casyuk')} title="Join Discord">
+              <MessageCircle size={18} />
+            </button>
+            <button className="icon-btn" onClick={() => openUrl('https://casyuk.com')} title="Official Website">
+              <Globe size={18} />
+            </button>
+            
+            <div style={{ width: '2px', height: '24px', background: 'var(--border-color)', margin: '0 0.5rem', opacity: 0.5 }}></div>
+
             <button className="icon-btn theme-toggle" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title="Toggle Theme">
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <button className="icon-btn" onClick={testNotification} title="Test Notification">
-              <Bell size={18} />
-            </button>
-            <div className="search-box">
-              <span className="search-icon"><Search size={16} /></span>
-              <input
-                type="text"
-                placeholder="Search alerts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
           </div>
         </header>
 

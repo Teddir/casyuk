@@ -1,12 +1,13 @@
-import { Lock } from 'lucide-react';
+import { Lock, Gift } from 'lucide-react';
 
 interface Props {
   onUpgradeClick: () => void;
   featureName?: string;
   variant?: 'card' | 'badge';
+  showContestBanner?: boolean;
 }
 
-export function ProGateOverlay({ onUpgradeClick, featureName = "Pro Feature", variant = 'card' }: Props) {
+export function ProGateOverlay({ onUpgradeClick, featureName = "Pro Feature", variant = 'card', showContestBanner = false }: Props) {
   if (variant === 'badge') {
     return (
       <div style={{
@@ -92,10 +93,32 @@ export function ProGateOverlay({ onUpgradeClick, featureName = "Pro Feature", va
         <button
           className="text-btn"
           onClick={onUpgradeClick}
-          style={{ background: 'var(--accent-green)', padding: '0.8rem 1.5rem', fontSize: '1rem', width: '100%' }}
+          style={{ background: 'var(--accent-green)', padding: '0.8rem 1.5rem', fontSize: '1rem', width: '100%', marginBottom: showContestBanner ? '1.5rem' : '0' }}
         >
           Upgrade to Pro
         </button>
+        
+        {showContestBanner && (
+          <div style={{
+            background: 'rgba(166, 246, 208, 0.3)',
+            padding: '1rem',
+            borderRadius: '8px',
+            border: '2px dashed var(--border-color)',
+            textAlign: 'left'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <Gift size={18} color="var(--border-color)" />
+              <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-main)', fontWeight: 800 }}>🔥 Steal a LIFETIME Pro Key!</h4>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: '1.4' }}>
+              Why pay when your creativity can? Submit <strong>3 jaw-dropping, uniquely crafted video alerts</strong>. If they're sick enough to make it into the official CasYuk Video Bank, a Lifetime Pro License is yours for absolutely $0.
+              <br /><br />
+              <span style={{ fontWeight: 'bold', display: 'inline-block', marginBottom: '0.5rem', background: '#000', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem' }}>💡 PRO TIP</span> Videos with a <strong>Green Screen / Transparent</strong> background get massive bonus points!
+              <br /><br />
+              Drop your stash here: <a href="mailto:teddir.ads@gmail.com" style={{ fontWeight: 'bold', color: 'var(--border-color)', textDecoration: 'underline' }}>teddir.ads@gmail.com</a>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

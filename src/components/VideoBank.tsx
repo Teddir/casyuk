@@ -181,7 +181,7 @@ export function VideoBank({ isPro = false, onUpgradeClick }: VideoBankProps) {
       </div>
 
       <div style={{ position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
-        {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Full Video Bank" variant="card" />}
+        {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Full Video Bank" variant="card" showContestBanner={true} />}
         <div style={{ opacity: isPro ? 1 : 0.4, pointerEvents: isPro ? 'auto' : 'none' }}>
           {VIDEO_PACKS.map((pack) => (
             <div key={pack.packName} className="widget-card" style={{ marginBottom: '2rem' }}>
