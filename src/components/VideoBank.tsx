@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { load } from '@tauri-apps/plugin-store';
-import { Film, Play, Pause } from 'lucide-react';
+import { Play, Pause } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { VIDEO_PACKS } from '../lib/videoBank';
+import { ProGateOverlay } from './ProGateOverlay';
 
 const trackEvent = async (name: string, props?: Record<string, string | number | boolean>) => {
   try {
@@ -122,7 +123,12 @@ function ChromaKeyVideo({ src, isSelected }: { src: string, isSelected: boolean 
   );
 }
 
-export function VideoBank() {
+interface VideoBankProps {
+  isPro?: boolean;
+  onUpgradeClick?: () => void;
+}
+
+export function VideoBank({ isPro = false, onUpgradeClick }: VideoBankProps) {
   const [store, setStore] = useState<any>(null);
   const [activeVideoId, setActiveVideoId] = useState('default');
   const [isSaved, setIsSaved] = useState(false);
@@ -163,57 +169,66 @@ export function VideoBank() {
     <div className="settings-panel">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
-          <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Film size={28} /> Video Bank
-            <span style={{ background: 'var(--accent-green)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', marginLeft: '10px', verticalAlign: 'middle', color: '#000' }}>PRO</span>
+          <h2 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            🎬 Video Bank
+            {!isPro && <span style={{ background: 'var(--accent-red)', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold' }}>LOCKED</span>}
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Choose your emotional companion for battery alerts.</p>
+          <p style={{ margin: 0, color: 'var(--text-muted)' }}>Choose an emotional response for your battery alerts.</p>
         </div>
         <div>
           {isSaved && <span style={{ color: 'var(--accent-green)', fontWeight: 'bold' }}>✓ Saved!</span>}
         </div>
       </div>
 
-      {VIDEO_PACKS.map((pack) => (
-        <div key={pack.packName} className="widget-card" style={{ marginBottom: '2rem' }}>
-          <div className="widget-header">
-            <h3>{pack.packName}</h3>
-          </div>
-          <div className="widget-content">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.5rem' }}>
-              {pack.videos.map(vid => {
-                const isSelected = activeVideoId === vid.id;
-                return (
-                  <div 
-                    key={vid.id}
-                    onClick={() => handleSaveSelection(vid.id)}
-                    style={{ 
-                      cursor: 'pointer',
-                      borderRadius: '12px', 
-                      border: isSelected ? '4px solid var(--accent-green)' : '4px solid transparent',
-                      overflow: 'hidden',
-                      background: '#000',
-                      position: 'relative',
-                      boxShadow: isSelected ? '0 0 15px rgba(52, 211, 153, 0.3)' : '0 4px 6px rgba(0,0,0,0.1)',
-                      transition: 'all 0.2s ease'
-                    }}
-                  >
-                    <ChromaKeyVideo src={vid.src} isSelected={isSelected} />
-                    <div style={{ padding: '0.8rem', background: isSelected ? 'var(--accent-green)' : 'var(--primary-color)', color: isSelected ? '#000' : 'var(--text-main)', textAlign: 'center', fontWeight: 'bold' }}>
-                      {vid.name}
-                    </div>
-                    {isSelected && (
-                      <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--accent-green)', color: '#000', padding: '4px 8px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
-                        Active
+      <div style={{ position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
+        {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Full Video Bank" variant="card" />}
+        <div style={{ opacity: isPro ? 1 : 0.4, pointerEvents: isPro ? 'auto' : 'none' }}>
+          {VIDEO_PACKS.map((pack) => (
+            <div key={pack.packName} className="widget-card" style={{ marginBottom: '2rem' }}>
+              <div className="widget-header">
+                <h3>{pack.packName}</h3>
+              </div>
+              <div className="widget-content">
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+                  gap: '1.5rem',
+                }}>
+                  {pack.videos.map(vid => {
+                    const isSelected = activeVideoId === vid.id;
+                    return (
+                      <div 
+                        key={vid.id}
+                        onClick={() => isPro && handleSaveSelection(vid.id)}
+                        style={{ 
+                          cursor: isPro ? 'pointer' : 'default',
+                          borderRadius: '12px', 
+                          border: isSelected ? '4px solid var(--accent-green)' : '4px solid transparent',
+                          overflow: 'hidden',
+                          background: '#000',
+                          position: 'relative',
+                          boxShadow: isSelected ? '0 0 15px rgba(52, 211, 153, 0.3)' : '0 4px 6px rgba(0,0,0,0.1)',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        <ChromaKeyVideo src={vid.src} isSelected={isSelected} />
+                        <div style={{ padding: '0.8rem', background: isSelected ? 'var(--accent-green)' : 'var(--primary-color)', color: isSelected ? '#000' : 'var(--text-main)', textAlign: 'center', fontWeight: 'bold' }}>
+                          {vid.name}
+                        </div>
+                        {isSelected && (
+                          <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--accent-green)', color: '#000', padding: '4px 8px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                            Active
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }

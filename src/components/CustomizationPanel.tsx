@@ -4,8 +4,14 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { emit } from '@tauri-apps/api/event';
 import { Palette, RotateCcw, Save, Music } from 'lucide-react';
+import { ProGateOverlay } from './ProGateOverlay';
 
-export function CustomizationPanel() {
+interface CustomizationPanelProps {
+  isPro?: boolean;
+  onUpgradeClick?: () => void;
+}
+
+export function CustomizationPanel({ isPro = false, onUpgradeClick }: CustomizationPanelProps) {
   const [store, setStore] = useState<any>(null);
   
   // Media State
@@ -110,11 +116,13 @@ export function CustomizationPanel() {
       <div className="widgets-row">
         <div className="widget-card" style={{ gridColumn: '1 / -1' }}>
           <div className="widget-header">
-            <h3>🎬 Custom Green-Screen Upload <span style={{ background: 'var(--accent-green)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', marginLeft: '10px', color: '#000' }}>PRO</span></h3>
+            <h3>🎬 Custom Green-Screen Upload {!isPro && <span style={{ background: 'var(--accent-red)', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold', marginLeft: '8px' }}>LOCKED</span>}</h3>
           </div>
-          <div className="widget-content">
+          <div className="widget-content" style={{ position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
+            {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Custom Uploads" variant="badge" />}
+            
             <p style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>Upload your own custom green-screen video to use as an alert.</p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isPro ? 1 : 0.4 }}>
               <input 
                 type="text" 
                 readOnly 
@@ -122,7 +130,7 @@ export function CustomizationPanel() {
                 style={{ flex: 1, padding: '0.8rem', fontWeight: 600, boxSizing: 'border-box' }} 
                 title={customVideoPath || 'Custom Video'}
               />
-              <button onClick={handlePickVideo} className="text-btn" style={{ background: 'var(--accent-blue)', flexShrink: 0 }}>
+              <button onClick={handlePickVideo} disabled={!isPro} className="text-btn" style={{ background: 'var(--accent-blue)', flexShrink: 0 }}>
                 Browse Local File...
               </button>
             </div>
@@ -131,10 +139,12 @@ export function CustomizationPanel() {
 
         <div className="widget-card">
           <div className="widget-header">
-            <h3>Audio Alert</h3>
+            <h3>Audio Alert {!isPro && <span style={{ background: 'var(--accent-red)', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold', marginLeft: '8px' }}>LOCKED</span>}</h3>
           </div>
-          <div className="widget-content">
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Select Custom Audio</label>
+          <div className="widget-content" style={{ position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
+            {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Custom Audio" variant="badge" />}
+            
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', opacity: isPro ? 1 : 0.4 }}>Select Custom Audio</label>
             <div className="neo-card" style={{ padding: '1.5rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '1rem', background: 'var(--primary-color)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Music size={48} color="var(--text-main)" />
@@ -146,7 +156,7 @@ export function CustomizationPanel() {
               )}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isPro ? 1 : 0.4 }}>
               <input 
                 type="text" 
                 readOnly 
@@ -154,7 +164,7 @@ export function CustomizationPanel() {
                 style={{ flex: 1, padding: '0.8rem', fontWeight: 600, boxSizing: 'border-box' }} 
                 title={customAudioPath || 'Silent'}
               />
-              <button onClick={handlePickAudio} className="text-btn" style={{ background: 'var(--accent-green)', flexShrink: 0 }}>
+              <button onClick={handlePickAudio} disabled={!isPro} className="text-btn" style={{ background: 'var(--accent-green)', flexShrink: 0 }}>
                 Browse...
               </button>
             </div>

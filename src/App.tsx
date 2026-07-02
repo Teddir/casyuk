@@ -11,7 +11,9 @@ import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
+import { load } from '@tauri-apps/plugin-store';
 import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film } from 'lucide-react';
+import { LicenseModal } from './components/LicenseModal';
 import './App.css';
 
 // Helper function to track events via Tauri v2 IPC
@@ -31,11 +33,36 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isPro, setIsPro] = useState(false);
+  const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [appVersion, setAppVersion] = useState('...');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToastMessage = (msg: string) => {
+    setToastMessage(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   // Initialize App and check onboarding
   useEffect(() => {
+    const initApp = async () => {
+      const store = await load('settings.json');
+      const storedTheme = await store.get<{ value: string }>('theme');
+      if (storedTheme && (storedTheme.value === 'light' || storedTheme.value === 'dark')) {
+        setTheme(storedTheme.value);
+      }
+      
+      const proStatus = await store.get<{ value: boolean }>('is_pro_activated');
+      if (proStatus) {
+        setIsPro(proStatus.value);
+      }
+    };
+
+    initApp();
+
     getVersion().then((ver) => {
       setAppVersion(ver);
       trackEvent('app_launched', { version: ver, os: 'macos' });
@@ -234,19 +261,19 @@ function App() {
     }
 
     if (currentView === 'video_bank') {
-      return <VideoBank />;
+      return <VideoBank isPro={isPro} onUpgradeClick={() => setShowLicenseModal(true)} />;
     }
 
     if (currentView === 'battery_monitor') {
-      return <BatteryMonitor battery={battery} />;
+      return <BatteryMonitor battery={battery} isPro={isPro} onUpgradeClick={() => setShowLicenseModal(true)} />;
     }
 
     if (currentView === 'charging_control') {
-      return <ChargingControl battery={battery} />;
+      return <ChargingControl battery={battery} isPro={isPro} onUpgradeClick={() => setShowLicenseModal(true)} />;
     }
 
     if (currentView === 'customization') {
-      return <CustomizationPanel />;
+      return <CustomizationPanel isPro={isPro} onUpgradeClick={() => setShowLicenseModal(true)} />;
     }
 
     if (currentView === 'settings') {
@@ -348,12 +375,42 @@ function App() {
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <div className="avatar">C</div>
+            <div className="avatar">{isPro ? '🚀' : 'C'}</div>
             {isSidebarOpen && (
               <div className="user-info">
-                <p className="name" title="CasYuk System">CasYuk System</p>
-                <p className="email" title={`v${appVersion}-pro`}>v{appVersion}-pro</p>
+                <p className="name" title={isPro ? "CasYuk Pro" : "CasYuk"}>{isPro ? "CasYuk Pro" : "CasYuk"}</p>
+                <p className="email" title={`v${appVersion}${isPro ? '-pro' : '-free'}`}>v{appVersion}{isPro ? <span style={{color:'var(--accent-green)', fontWeight:'bold'}}> PRO</span> : ''}</p>
               </div>
+            )}
+            {!isPro && isSidebarOpen && (
+              <button 
+                onClick={() => setShowLicenseModal(true)}
+                style={{ 
+                  marginLeft: 'auto', background: 'var(--accent-green)', color: '#000', 
+                  border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem',
+                  fontWeight: 'bold', cursor: 'pointer'
+                }}
+              >
+                UPGRADE
+              </button>
+            )}
+            {isPro && isSidebarOpen && (
+              <button 
+                onClick={async () => {
+                  const store = await load('settings.json');
+                  await store.delete('is_pro_activated');
+                  await store.save();
+                  setIsPro(false);
+                  showToastMessage('Pro Plan Reset (Testing)');
+                }}
+                style={{ 
+                  marginLeft: 'auto', background: 'var(--accent-red)', color: '#fff', 
+                  border: 'none', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem',
+                  fontWeight: 'bold', cursor: 'pointer'
+                }}
+              >
+                RESET
+              </button>
             )}
           </div>
         </div>
@@ -401,6 +458,25 @@ function App() {
           {renderContent()}
         </div>
       </main>
+
+      {/* Notification Toast */}
+      {showToast && (
+        <div className="toast">
+          {toastMessage}
+        </div>
+      )}
+      
+      {/* License Modal */}
+      {showLicenseModal && (
+        <LicenseModal 
+          onSuccess={() => {
+            setIsPro(true);
+            setShowLicenseModal(false);
+            showToastMessage('CasYuk Pro successfully activated! 🎉');
+          }}
+          onCancel={() => setShowLicenseModal(false)}
+        />
+      )}
     </div>
   );
 }

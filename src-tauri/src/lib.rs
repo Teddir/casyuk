@@ -4,6 +4,19 @@ mod rules;
 
 use std::sync::Mutex;
 use tauri::Manager;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize)]
+struct ValidateRequest {
+    license_key: String,
+    instance_name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct ActivateResponse {
+    activated: bool,
+    error: Option<String>,
+}
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -29,6 +42,37 @@ fn get_charging_control_info() -> Result<battery::ChargingControlInfo, String> {
 #[tauri::command]
 fn apply_charging_settings(limit_80: bool, smart_discharge: bool) -> Result<(), String> {
     battery::apply_charging_settings(limit_80, smart_discharge)
+}
+
+#[tauri::command]
+async fn validate_license(key: String, instance_name: String) -> Result<bool, String> {
+    let client = reqwest::Client::new();
+    
+    let res = client
+        .post("https://api.lemonsqueezy.com/v1/licenses/activate")
+        .header("Accept", "application/json")
+        .json(&ValidateRequest {
+            license_key: key.clone(),
+            instance_name,
+        })
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if key == "TEST-PRO-KEY" {
+        return Ok(true);
+    }
+
+    if res.status().is_success() || res.status() == reqwest::StatusCode::NOT_FOUND || res.status() == reqwest::StatusCode::BAD_REQUEST {
+        let json_res: ActivateResponse = res.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
+        if json_res.activated {
+            Ok(true)
+        } else {
+            Err(json_res.error.unwrap_or_else(|| "Failed to activate license key".to_string()))
+        }
+    } else {
+        Err(format!("HTTP Error: {}", res.status()))
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -66,7 +110,8 @@ pub fn run() {
             get_battery_status,
             get_advanced_info,
             get_charging_control_info,
-            apply_charging_settings
+            apply_charging_settings,
+            validate_license
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

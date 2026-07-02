@@ -18,6 +18,7 @@ export function AlertWindow() {
   const [activeAlert, setActiveAlert] = useState<AlertData | null>(null);
   const [customVideoUrl, setCustomVideoUrl] = useState<string | null>(null);
   const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
+  const [activeVideoId, setActiveVideoId] = useState<string>('default');
 
   const [isExiting, setIsExiting] = useState(false);
 
@@ -46,7 +47,7 @@ export function AlertWindow() {
         // Optional: Track this successful behavior
         invoke('plugin:aptabase|track_event', {
           name: 'charger_connected_after_alert',
-          props: { percentage: battery.percentage }
+          props: { percentage: battery.percentage, video_id: activeVideoId }
         }).catch(console.error);
       }
     }
@@ -73,6 +74,9 @@ export function AlertWindow() {
         const store = await load('settings.json');
         const savedVid = await store.get<{ value: string }>('custom_video_path');
         const savedAud = await store.get<{ value: string }>('custom_audio_path');
+        const savedId = await store.get<{ value: string }>('custom_video_id');
+        
+        setActiveVideoId(savedId?.value || 'default');
 
         if (savedVid && savedVid.value) {
           if (savedVid.value.startsWith('http')) {
@@ -93,15 +97,18 @@ export function AlertWindow() {
         } else {
           setCustomAudioUrl(null);
         }
+        
+        return savedId?.value || 'default';
       } catch (e) {
         console.error('Failed to load custom media settings', e);
+        return 'default';
       }
     }
 
     // Listen for alerts from Rust
     const unlisten = listen<string>('trigger-alert', async (event) => {
       try {
-        await loadSettings(); // Reload settings right before showing
+        const videoId = await loadSettings(); // Reload settings right before showing
         const payload = JSON.parse(event.payload) as AlertData;
         setActiveAlert(payload);
         setIsExiting(false);
@@ -116,6 +123,11 @@ export function AlertWindow() {
           payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
           `Battery is at ${payload.percentage}%`
         );
+        
+        invoke('plugin:aptabase|track_event', {
+          name: 'alert_shown',
+          props: { percentage: payload.percentage, video_id: videoId, is_test: false }
+        }).catch(console.error);
       } catch (e) {
         console.error('Failed to parse alert payload', e);
       }
@@ -123,7 +135,7 @@ export function AlertWindow() {
 
     // Listen for testing button dispatch from the main window
     const unlistenTest = listen<AlertData>('test-alert-event', async (event) => {
-      await loadSettings(); // Reload settings right before showing
+      const videoId = await loadSettings(); // Reload settings right before showing
       setActiveAlert(event.payload);
       setIsExiting(false);
       
@@ -136,6 +148,11 @@ export function AlertWindow() {
         event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
         `Battery is at ${event.payload.percentage}%`
       );
+
+      invoke('plugin:aptabase|track_event', {
+        name: 'alert_shown',
+        props: { percentage: event.payload.percentage, video_id: videoId, is_test: true }
+      }).catch(console.error);
     });
 
     // Remove body dot pattern for transparent window

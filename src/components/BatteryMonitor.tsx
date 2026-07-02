@@ -2,9 +2,12 @@ import { BatteryStatus } from '../types/battery';
 import { Battery, Lightbulb } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useEffect, useState } from 'react';
+import { ProGateOverlay } from './ProGateOverlay';
 
 interface Props {
   battery: BatteryStatus | null;
+  isPro?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 interface AdvancedInfo {
@@ -14,7 +17,7 @@ interface AdvancedInfo {
   serial_number: string;
 }
 
-export function BatteryMonitor({ battery }: Props) {
+export function BatteryMonitor({ battery, isPro = false, onUpgradeClick }: Props) {
   const [advInfo, setAdvInfo] = useState<AdvancedInfo | null>(null);
 
   useEffect(() => {
@@ -71,10 +74,12 @@ export function BatteryMonitor({ battery }: Props) {
 
         <div className="widget-card">
           <div className="widget-header">
-            <h3>Advanced Hardware Info</h3>
+            <h3>Advanced Hardware Info {!isPro && <span style={{ background: 'var(--accent-red)', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold', marginLeft: '8px' }}>LOCKED</span>}</h3>
           </div>
-          <div className="widget-content" style={{ padding: '1rem 0' }}>
-            <div style={{ padding: '4px' }}>
+          <div className="widget-content" style={{ padding: '1rem 0', position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
+            {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Advanced Hardware Info" variant="badge" />}
+            
+            <div style={{ padding: '4px', opacity: isPro ? 1 : 0.4 }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div className="neo-card" style={{ padding: '1rem', backgroundColor: 'var(--card-bg)' }}>
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.5rem', textTransform: 'uppercase' }}>Technology</div>

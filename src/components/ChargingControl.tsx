@@ -2,9 +2,12 @@ import { BatteryStatus } from '../types/battery';
 import { Zap } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useEffect, useState } from 'react';
+import { ProGateOverlay } from './ProGateOverlay';
 
 interface Props {
   battery: BatteryStatus | null;
+  isPro?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 interface ChargingInfo {
@@ -14,7 +17,7 @@ interface ChargingInfo {
   time_to_full: string;
 }
 
-export function ChargingControl({ battery }: Props) {
+export function ChargingControl({ battery, isPro = false, onUpgradeClick }: Props) {
   const isCharging = battery?.state === 'charging' || battery?.state === 'full';
   const [info, setInfo] = useState<ChargingInfo | null>(null);
   
@@ -85,17 +88,19 @@ export function ChargingControl({ battery }: Props) {
 
         <div className="widget-card">
           <div className="widget-header">
-            <h3>Advanced Power Management</h3>
+            <h3>Advanced Power Management {!isPro && <span style={{ background: 'var(--accent-red)', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontSize: '0.7rem', fontWeight: 'bold', marginLeft: '8px' }}>LOCKED</span>}</h3>
           </div>
-          <div className="widget-content" style={{ padding: '1rem 0' }}>
-            <div style={{ padding: '4px' }}>
+          <div className="widget-content" style={{ padding: '1rem 0', position: 'relative', overflow: isPro ? 'auto' : 'hidden' }}>
+            {!isPro && <ProGateOverlay onUpgradeClick={onUpgradeClick!} featureName="Advanced Power Management" variant="badge" />}
+            
+            <div style={{ padding: '4px', opacity: isPro ? 1 : 0.4 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '2px solid var(--border-color)' }}>
                 <div>
                   <strong style={{ display: 'block', marginBottom: '0.2rem' }}>Limit Charge to 80%</strong>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Prolong battery lifespan (requires bclm)</span>
                 </div>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={limit80} onChange={(e) => setLimit80(e.target.checked)} style={{ width: '24px', height: '24px', accentColor: 'var(--text-main)', cursor: 'pointer' }} />
+                  <input type="checkbox" checked={limit80} onChange={(e) => isPro && setLimit80(e.target.checked)} disabled={!isPro} style={{ width: '24px', height: '24px', accentColor: 'var(--text-main)', cursor: isPro ? 'pointer' : 'default' }} />
                 </label>
               </div>
 
@@ -105,11 +110,11 @@ export function ChargingControl({ battery }: Props) {
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Use battery while plugged in</span>
                 </div>
                 <label style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
-                  <input type="checkbox" checked={smartDischarge} onChange={(e) => setSmartDischarge(e.target.checked)} style={{ width: '24px', height: '24px', accentColor: 'var(--text-main)', cursor: 'pointer' }} />
+                  <input type="checkbox" checked={smartDischarge} onChange={(e) => isPro && setSmartDischarge(e.target.checked)} disabled={!isPro} style={{ width: '24px', height: '24px', accentColor: 'var(--text-main)', cursor: isPro ? 'pointer' : 'default' }} />
                 </label>
               </div>
 
-              <button className="text-btn" onClick={handleApply} style={{ width: '100%', marginTop: '1rem', padding: '1rem' }}>
+              <button className="text-btn" onClick={() => isPro && handleApply()} disabled={!isPro} style={{ width: '100%', marginTop: '1rem', padding: '1rem', cursor: isPro ? 'pointer' : 'default' }}>
                 Apply Settings
               </button>
             </div>
