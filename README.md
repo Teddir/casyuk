@@ -45,12 +45,12 @@ You can install CasYuk with a single command on any supported operating system.
 
 ### macOS & Linux (Terminal)
 ```bash
-curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.sh | bash
 ```
 
 ### Windows (PowerShell)
 ```powershell
-iwr -useb https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
 ```
 
 Alternatively, download the latest compiled binary installers directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).
