@@ -131,7 +131,7 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
         </div>
         
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Don't have a license key? <a href="#" onClick={(e) => { e.preventDefault(); openUrl('https://casyuk.lemonsqueezy.com/buy/casyuk-pro'); }} style={{ color: 'var(--border-color)', textDecoration: 'underline', fontWeight: 'bold' }}>Get CasYuk Pro</a>
+          Don't have a license key? <a href="#" onClick={(e) => { e.preventDefault(); openUrl('https://casyuk.lemonsqueezy.com/buy/casyuk-pro'); }} style={{ color: 'var(--text-main)', textDecoration: 'underline', fontWeight: 'bold' }}>Get CasYuk Pro</a>
         </div>
       </div>
     </div>

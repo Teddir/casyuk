@@ -30,7 +30,9 @@
   --accent-yellow: #eab308;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -82,7 +84,7 @@ body {
 }
 
 .sidebar-open .sidebar {
-  width: 270px;
+  width: 250px;
   padding: 0;
 }
 
@@ -93,6 +95,14 @@ body {
 }
 
 .sidebar-closed .brand-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+}
+
+.sidebar-closed .brand-left h2 {
   display: none;
 }
 
@@ -843,6 +853,7 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
 .onboarding-btn {
   background: var(--accent-green);
   color: #000000;
@@ -872,8 +883,13 @@ body {
 
 /* Animations */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spin-anim {
@@ -893,7 +909,7 @@ body {
 
 .announcement-bar {
   background: var(--accent-purple);
-  color: #000;
+  color: var(--text-main);
   border-bottom: 2px solid var(--border-color);
   height: 40px;
   min-height: 40px;
@@ -923,8 +939,13 @@ body {
 }
 
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 .toast {
@@ -944,13 +965,27 @@ body {
 }
 
 @keyframes slideUp {
-  from { transform: translate(-50%, 100%); opacity: 0; }
-  to { transform: translate(-50%, 0); opacity: 1; }
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
 
 @keyframes popIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .animate-spin {
