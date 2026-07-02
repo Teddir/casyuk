@@ -6,13 +6,13 @@ import { CustomizationPanel } from './components/CustomizationPanel';
 import { VideoBank } from './components/VideoBank';
 import { BatteryMonitor } from './components/BatteryMonitor';
 import { ChargingControl } from './components/ChargingControl';
-import { isPermissionGranted, requestPermission, sendNotification } from '@tauri-apps/plugin-notification';
+import { requestPermission } from '@tauri-apps/plugin-notification';
 import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { load } from '@tauri-apps/plugin-store';
-import { LayoutDashboard, Battery, Palette, Settings, Zap, Search, Moon, Sun, Bell, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, MessageCircle, Crown, Mail } from 'lucide-react';
+import { LayoutDashboard, Battery, Palette, Settings, Zap, Moon, Sun, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, Crown, Mail } from 'lucide-react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { LicenseModal } from './components/LicenseModal';
 import './App.css';
@@ -33,7 +33,6 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-  const [searchQuery, setSearchQuery] = useState('');
   const [isPro, setIsPro] = useState(false);
   const [showLicenseModal, setShowLicenseModal] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -110,20 +109,6 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  const testNotification = async () => {
-    try {
-      let permissionGranted = await isPermissionGranted();
-      if (!permissionGranted) {
-        const permission = await requestPermission();
-        permissionGranted = permission === 'granted';
-      }
-      if (permissionGranted) {
-        sendNotification({ title: 'CasYuk 🔋', body: 'This is a test notification from your battery companion!' });
-      }
-    } catch (err) {
-      console.error('Error sending notification:', err);
-    }
-  };
 
   const isCharging = battery?.state === 'charging' || battery?.state === 'full';
 
@@ -166,10 +151,8 @@ function App() {
     }
     prevBatteryRef.current = battery;
   }, [battery]);
+  const filteredAlerts = alerts;
 
-  const filteredAlerts = alerts.filter(alert =>
-    alert.text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const renderContent = () => {
     if (currentView === 'dashboard') {
