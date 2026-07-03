@@ -112,8 +112,14 @@ pub fn get_advanced_info() -> Result<AdvancedHardwareInfo, String> {
 
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        
         let mut design_cap = String::from("N/A");
-        if let Ok(out) = std::process::Command::new("powershell").args(["-Command", "(Get-WmiObject Win32_Battery).DesignCapacity"]).output() {
+        if let Ok(out) = std::process::Command::new("powershell")
+            .creation_flags(CREATE_NO_WINDOW)
+            .args(["-Command", "(Get-WmiObject Win32_Battery).DesignCapacity"])
+            .output() {
             let stdout = String::from_utf8_lossy(&out.stdout);
             if let Some(val) = stdout.lines().next() {
                 if !val.trim().is_empty() {
@@ -236,9 +242,14 @@ pub fn get_charging_control_info() -> Result<ChargingControlInfo, String> {
 
     #[cfg(target_os = "windows")]
     {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
         let mut source = String::from("Battery");
         
-        if let Ok(out) = std::process::Command::new("powershell").args(["-Command", "(Get-WmiObject Win32_Battery).BatteryStatus"]).output() {
+        if let Ok(out) = std::process::Command::new("powershell")
+            .creation_flags(CREATE_NO_WINDOW)
+            .args(["-Command", "(Get-WmiObject Win32_Battery).BatteryStatus"])
+            .output() {
             let stdout = String::from_utf8_lossy(&out.stdout);
             let val = stdout.trim();
             if val == "2" {

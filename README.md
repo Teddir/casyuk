@@ -35,25 +35,33 @@ By utilizing dynamic, high-quality **green-screen (chroma-key) video overlays**,
 *   🌍 **True Cross-Platform**: Native battery telemetry on **macOS (IOKit)**, **Windows (WMI)**, and **Linux (UPower/Sysfs)**.
 *   🎭 **Chroma-Key Video Engine (Pro)**: Replaces boring push notifications with transparent, high-fidelity video overlays that demand attention.
 *   ⚡ **Smart Charge Limiter**: Automatically stops charging at 80% to preserve battery cell chemistry (hardware dependent).
+*   🎛️ **Granular Customization**: Full control over your alert experience with independent toggles for system notifications, video audio, custom sound alerts, and UI glassmorphism visibility.
+*   🛡️ **Self-Healing Media**: Robust fallback architecture that automatically reverts to default assets if custom-uploaded media is moved, renamed, or deleted.
 *   📊 **Behavioral Analytics**: Tracks success metrics (*time to response after notification*, *plug rate*) to validate the emotional trigger's effectiveness.
-*   🚀 **Insanely Fast & Lightweight**: Powered by Tauri v2 and Rust, ensuring near-zero CPU/RAM overhead while continuously monitoring hardware states.
+*   🚀 **Insanely Fast & Lightweight**: Powered by Tauri v2 and Rust with aggressive canvas downscaling and frame-throttling to minimize CPU/RAM overhead during intense alerts.
 *   🔄 **Seamless Auto-Updates**: Built-in CI/CD pipeline pushes delta updates directly to users globally.
 
 ## 🚀 Installation
 
-You can install CasYuk with a single command on any supported operating system.
+You can install CasYuk using our automated terminal scripts, or by downloading the installer directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).
 
-### macOS & Linux (Terminal)
+### 🍎 macOS
 ```bash
 curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.sh | bash
 ```
+> *Alternatively: Download the `.dmg` file from the Releases page and drag CasYuk to your Applications folder.*
 
-### Windows (PowerShell)
+### 🪟 Windows
 ```powershell
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr -useb https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
 ```
+> *Alternatively: Download the `.msi` file from the Releases page and run the installer.*
 
-Alternatively, download the latest compiled binary installers directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).
+### 🐧 Linux (Debian/Ubuntu)
+```bash
+curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.sh | bash
+```
+> *Note: For non-Debian distributions, download the standalone `.AppImage` from the Releases page.*
 
 ### Building from Source
 
