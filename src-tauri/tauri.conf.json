@@ -18,7 +18,8 @@
         "height": 600,
         "label": "main",
         "titleBarStyle": "Overlay",
-        "hiddenTitle": true
+        "hiddenTitle": true,
+        "visible": true
       },
       {
         "title": "CasYuk Alert",

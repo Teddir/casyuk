@@ -9,7 +9,7 @@ import { ChargingControl } from './components/ChargingControl';
 import { requestPermission } from '@tauri-apps/plugin-notification';
 import { invoke } from '@tauri-apps/api/core';
 import { getVersion } from '@tauri-apps/api/app';
-import { check } from '@tauri-apps/plugin-updater';
+import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { load } from '@tauri-apps/plugin-store';
 import { LayoutDashboard, Battery, Palette, Settings, Zap, Moon, Sun, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, Crown, Mail } from 'lucide-react';
@@ -39,6 +39,8 @@ function App() {
   const [appVersion, setAppVersion] = useState('...');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [pendingUpdate, setPendingUpdate] = useState<Update | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const showToastMessage = (msg: string) => {
     setToastMessage(msg);
@@ -75,34 +77,46 @@ function App() {
       setShowOnboarding(true);
     }
   }, []);
-
-  // Silent Auto-Updater (Runs on startup & every 12 hours)
+  // Auto-Update Check (Runs on startup & every 12 hours)
   useEffect(() => {
-    const runSilentUpdater = async () => {
+    const runUpdateCheck = async () => {
       try {
         const update = await check();
         if (update) {
-          trackEvent('auto_update_started', { version: update.version });
-          await update.downloadAndInstall();
-          trackEvent('auto_update_success', { version: update.version });
-          await relaunch();
+          trackEvent('update_available', { version: update.version });
+          setPendingUpdate(update);
         }
       } catch (err) {
-        console.error("Silent auto-update failed:", err);
+        console.error("Update check failed:", err);
       }
     };
 
     // Delay the initial check slightly to avoid slowing down startup
-    const initialTimer = setTimeout(runSilentUpdater, 5000);
+    const initialTimer = setTimeout(runUpdateCheck, 5000);
 
     // Check every 12 hours
-    const intervalId = setInterval(runSilentUpdater, 12 * 60 * 60 * 1000);
+    const intervalId = setInterval(runUpdateCheck, 12 * 60 * 60 * 1000);
 
     return () => {
       clearTimeout(initialTimer);
       clearInterval(intervalId);
     };
   }, []);
+
+  const handleInstallUpdate = async () => {
+    if (!pendingUpdate) return;
+    setIsUpdating(true);
+    try {
+      trackEvent('auto_update_started', { version: pendingUpdate.version });
+      await pendingUpdate.downloadAndInstall();
+      trackEvent('auto_update_success', { version: pendingUpdate.version });
+      await relaunch();
+    } catch (err) {
+      console.error("Failed to install update:", err);
+      showToastMessage("Failed to install update. Please try again.");
+      setIsUpdating(false);
+    }
+  };
 
   // Toggle Theme
   useEffect(() => {
@@ -326,10 +340,10 @@ function App() {
       <div className={`app-layout ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`} style={{ flex: 1, height: 'calc(100vh - 40px)' }}>
         {/* Sidebar */}
         <aside className="sidebar">
-          <div className="brand" data-tauri-drag-region>
-            <div className="brand-left">
-              <img src="/logo.png" alt="CasYuk Logo" className="brand-logo-img" />
-              {isSidebarOpen && <h2>CasYuk</h2>}
+          <div className="brand" data-tauri-drag-region style={{ cursor: 'default' }}>
+            <div className="brand-left" data-tauri-drag-region>
+              <img src="/logo.png" alt="CasYuk Logo" className="brand-logo-img" data-tauri-drag-region />
+              {isSidebarOpen && <h2 data-tauri-drag-region>CasYuk</h2>}
             </div>
             <button className="collapse-btn icon-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               style={{ background: 'var(--primary-color)', border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)', color: 'var(--text-main)' }}
@@ -441,7 +455,7 @@ function App() {
         {/* Main Content */}
         <main className="main-area">
           <header className="topbar" data-tauri-drag-region>
-            <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="topbar-left" data-tauri-drag-region style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <button
                 className="icon-btn"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -450,7 +464,7 @@ function App() {
               >
                 <PanelLeft size={18} />
               </button>
-              <h1 style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800 }}>
+              <h1 data-tauri-drag-region style={{ fontSize: '1.2rem', margin: 0, fontWeight: 800, flex: 1, cursor: 'default' }}>
                 {currentView === 'dashboard' && 'Battery Overview'}
                 {currentView === 'video_bank' && 'Video Bank PRO'}
                 {currentView === 'battery_monitor' && 'Hardware Metrics'}
@@ -525,6 +539,52 @@ function App() {
             }}
             onCancel={() => setShowLicenseModal(false)}
           />
+        )}
+
+        {/* Update Modal */}
+        {pendingUpdate && (
+          <div className="modal-overlay">
+            <div className="modal neo-brutalist">
+              <h2 className="title" style={{ fontSize: '1.5rem', marginBottom: '16px' }}>New Version Available! 🚀</h2>
+              <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>
+                CasYuk version <strong style={{ color: 'var(--primary)' }}>{pendingUpdate.version}</strong> is ready to install.
+              </p>
+              
+              {pendingUpdate.body && (
+                <div style={{ 
+                  backgroundColor: 'var(--card-bg)', 
+                  border: '2px solid var(--border-color)', 
+                  borderRadius: '4px',
+                  padding: '12px',
+                  marginBottom: '24px',
+                  maxHeight: '150px',
+                  overflowY: 'auto',
+                  fontSize: '0.9rem',
+                  whiteSpace: 'pre-wrap',
+                  textAlign: 'left'
+                }}>
+                  {pendingUpdate.body}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={() => setPendingUpdate(null)}
+                  disabled={isUpdating}
+                >
+                  Remind Me Later
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleInstallUpdate}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? 'Installing...' : 'Update & Restart'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
