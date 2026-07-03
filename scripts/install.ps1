@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $Repo = "Teddir/casyuk"
 
 Write-Host "🔋 Installing CasYuk..." -ForegroundColor Cyan

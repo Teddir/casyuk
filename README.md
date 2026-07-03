@@ -50,7 +50,7 @@ curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install
 
 ### Windows (PowerShell)
 ```powershell
-iwr -useb https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; iwr -useb https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
 ```
 
 Alternatively, download the latest compiled binary installers directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).
