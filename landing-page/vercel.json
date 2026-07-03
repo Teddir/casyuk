@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/install.sh",
+      "destination": "https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.sh"
+    },
+    {
+      "source": "/install.ps1",
+      "destination": "https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.ps1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/download/mac",
+      "destination": "https://github.com/Teddir/casyuk/releases/latest/download/CasYuk-mac.dmg",
+      "permanent": false
+    },
+    {
+      "source": "/download/windows",
+      "destination": "https://github.com/Teddir/casyuk/releases/latest/download/CasYuk-setup.exe",
+      "permanent": false
+    }
+  ]
+}
