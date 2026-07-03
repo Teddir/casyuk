@@ -1,10 +1,36 @@
 import { motion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 import { Download, Zap, Settings, ShieldCheck, Rocket, Activity, Star } from 'lucide-react';
 import { NeoButton } from '../components/NeoButton';
 import { FeatureCard } from '../components/FeatureCard';
 import { StepCard } from '../components/StepCard';
 
 export function Home() {
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const installVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (heroVideoRef.current) observer.observe(heroVideoRef.current);
+    if (installVideoRef.current) observer.observe(installVideoRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
   return (
     <>
 
@@ -88,13 +114,17 @@ export function Home() {
               {/* Main Content (Video) */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: '#000', position: 'relative', overflow: 'hidden' }}>
                 <video
+                  ref={heroVideoRef}
                   autoPlay
                   loop
                   muted
                   playsInline
+                  preload="metadata"
+                  poster="/demo-poster.jpg"
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 >
-                  <source src="/demo-video.mp4" type="video/mp4" />
+                  <source src="/demo-video-1080p.webm" type="video/webm" />
+                  <source src="/demo-video-1080p.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
@@ -335,19 +365,18 @@ export function Home() {
                 {/* Video Placeholder */}
                 <div style={{ flex: 1, backgroundColor: '#000', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
                   <video
-                    autoPlay
+                    ref={installVideoRef}
                     loop
                     muted
                     playsInline
+                    preload="none"
+                    poster="/install-poster.jpg"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'relative', zIndex: 2 }}
                   >
-                    <source src="/install-demo.mp4" type="video/mp4" />
+                    <source src="/install-demo-1080p.webm" type="video/webm" />
+                    <source src="/install-demo-1080p.mp4" type="video/mp4" />
                   </video>
-                  {/* Fallback text if video not found yet */}
-                  <div style={{ position: 'absolute', color: '#666', textAlign: 'center', padding: '20px', zIndex: 1 }}>
-                    <p style={{ fontWeight: 600, margin: '0 0 8px 0' }}>[ Video Placeholder ]</p>
-                    <p style={{ fontSize: '0.9rem', margin: 0 }}>Save your terminal recording as<br /><code>/public/install-demo.mp4</code></p>
-                  </div>
+
                 </div>
               </div>
             </div>
