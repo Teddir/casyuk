@@ -43,25 +43,19 @@ By utilizing dynamic, high-quality **green-screen (chroma-key) video overlays**,
 
 ## 🚀 Installation
 
-You can install CasYuk using our automated terminal scripts, or by downloading the installer directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).
+Install with a single command. Support for macOS, Linux, and Windows.
 
-### 🍎 macOS
+### macOS / Ubuntu
 ```bash
-curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.sh | bash
+curl -fsSL https://casyuk.com/install.sh | bash
 ```
-> *Alternatively: Download the `.dmg` file from the Releases page and drag CasYuk to your Applications folder.*
 
-### 🪟 Windows
+### Windows
 ```powershell
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; irm https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.ps1 | iex
+iwr -useb https://casyuk.com/install.ps1 | iex
 ```
-> *Alternatively: Download the `.msi` file from the Releases page and run the installer.*
 
-### 🐧 Linux (Debian/Ubuntu)
-```bash
-curl -sSL https://raw.githubusercontent.com/Teddir/casyuk/master/scripts/install.sh | bash
-```
-> *Note: For non-Debian distributions, download the standalone `.AppImage` from the Releases page.*
+> *Alternatively: Download the installers directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).*
 
 ### Building from Source
 
