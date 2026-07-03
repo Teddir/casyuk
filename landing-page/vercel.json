@@ -1,14 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/install.sh",
-      "destination": "https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.sh"
-    },
-    {
-      "source": "/install.ps1",
-      "destination": "https://raw.githubusercontent.com/Teddir/casyuk/main/scripts/install.ps1"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
