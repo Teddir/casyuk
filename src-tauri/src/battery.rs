@@ -1,3 +1,4 @@
+#![allow(unused_imports, unused_mut, unused_variables, dead_code)]
 use serde::Serialize;
 use battery::Manager;
 use std::process::Command;

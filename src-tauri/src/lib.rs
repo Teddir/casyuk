@@ -134,6 +134,7 @@ pub fn run() {
         .expect("error while running tauri application")
         .run(|app_handle, event| {
             match event {
+                #[cfg(target_os = "macos")]
                 tauri::RunEvent::Reopen { .. } => {
                     if let Some(window) = app_handle.get_webview_window("main") {
                         #[cfg(target_os = "macos")]
