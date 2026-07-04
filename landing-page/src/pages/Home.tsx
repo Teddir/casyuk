@@ -24,8 +24,16 @@ export function Home() {
       { threshold: 0.1 }
     );
 
-    if (heroVideoRef.current) observer.observe(heroVideoRef.current);
-    if (installVideoRef.current) observer.observe(installVideoRef.current);
+    if (heroVideoRef.current) {
+      heroVideoRef.current.defaultMuted = true;
+      heroVideoRef.current.muted = true;
+      observer.observe(heroVideoRef.current);
+    }
+    if (installVideoRef.current) {
+      installVideoRef.current.defaultMuted = true;
+      installVideoRef.current.muted = true;
+      observer.observe(installVideoRef.current);
+    }
 
     return () => {
       observer.disconnect();
