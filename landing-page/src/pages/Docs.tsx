@@ -4,7 +4,7 @@ export function Docs({ type }: { type: 'api' | 'documentation' }) {
   const isApi = type === 'api';
 
   return (
-    <div style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-boxes-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container" style={{ maxWidth: '1000px', display: 'flex', gap: '48px' }}>
 
         {/* Sidebar */}

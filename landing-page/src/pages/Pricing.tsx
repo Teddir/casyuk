@@ -3,7 +3,7 @@ import { NeoButton } from '../components/NeoButton';
 
 export function Pricing() {
   return (
-    <div className="pattern-grid-faded hero-mask" style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-dots-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container">
 
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
@@ -16,7 +16,7 @@ export function Pricing() {
 
         {/* Pricing Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '24px', marginBottom: '100px' }}>
-          
+
           {/* Personal */}
           <div className="neo-box" style={{ padding: '32px', backgroundColor: 'var(--card-bg)', display: 'flex', flexDirection: 'column' }}>
             <h2 style={{ fontSize: '1.8rem', marginBottom: '8px' }}>Personal</h2>
@@ -100,24 +100,24 @@ export function Pricing() {
               <tbody>
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '20px 24px', fontWeight: 600 }}>Battery Monitoring</td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '20px 24px', fontWeight: 600 }}>Meme Video Alerts</td>
-                  <td style={{ textAlign: 'center' }}><X size={20} color="var(--text-muted)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
+                  <td style={{ textAlign: 'center' }}><X size={20} color="var(--text-muted)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
                 </tr>
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '20px 24px', fontWeight: 600 }}>Hardware SMC 80% Limit</td>
-                  <td style={{ textAlign: 'center' }}><X size={20} color="var(--text-muted)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
-                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }}/></td>
+                  <td style={{ textAlign: 'center' }}><X size={20} color="var(--text-muted)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center', backgroundColor: 'rgba(168, 255, 178, 0.1)' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
+                  <td style={{ textAlign: 'center' }}><Check size={20} color="var(--accent-green)" style={{ margin: '0 auto' }} /></td>
                 </tr>
 
                 <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
@@ -143,7 +143,7 @@ export function Pricing() {
         <div>
           <h2 style={{ fontSize: '3rem', marginBottom: '40px', textAlign: 'center' }}>Frequently Asked Questions</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
-            
+
             <div className="neo-box" style={{ padding: '32px', backgroundColor: 'var(--card-bg)' }}>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                 <HelpCircle size={28} color="var(--accent-purple)" style={{ flexShrink: 0, marginTop: '2px' }} />

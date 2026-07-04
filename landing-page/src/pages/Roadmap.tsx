@@ -2,7 +2,7 @@ import { Clock, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export function Roadmap() {
   return (
-    <div className="pattern-grid-faded hero-mask" style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-dense-dots-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>

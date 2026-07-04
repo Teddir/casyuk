@@ -1,6 +1,6 @@
 export function Terms() {
   return (
-    <div style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-cross-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
 
         <div style={{ marginBottom: '60px' }}>

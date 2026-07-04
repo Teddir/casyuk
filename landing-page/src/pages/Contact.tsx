@@ -2,7 +2,7 @@ import { Mail } from 'lucide-react';
 
 export function Contact() {
   return (
-    <div className="pattern-grid-faded hero-mask" style={{ padding: '160px 0 120px', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
+    <div className="pattern-stripes-faded hero-mask" style={{ padding: '180px 0 120px', minHeight: '60vh', display: 'flex', alignItems: 'center' }}>
       <div className="container" style={{ maxWidth: '600px', width: '100%' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>

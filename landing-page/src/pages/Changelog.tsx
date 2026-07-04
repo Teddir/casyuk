@@ -1,6 +1,6 @@
 export function Changelog() {
   return (
-    <div className="pattern-grid-faded hero-mask" style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-diagonal-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container" style={{ maxWidth: '800px' }}>
 
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>

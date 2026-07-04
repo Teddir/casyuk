@@ -217,10 +217,7 @@ a {
   .container {
     padding: 0 16px;
   }
-  main {
-    padding: 60px 0 40px !important;
-  }
-  
+
   .bento-grid {
     grid-template-columns: 1fr;
   }
@@ -285,11 +282,25 @@ a {
     linear-gradient(-45deg, var(--border-color) 1px, transparent 1px);
   background-size: 20px 20px;
 }
-.pattern-grid-faded {
+/* Base Pattern Class */
+.pattern-grid-faded,
+.pattern-dots-faded,
+.pattern-cross-faded,
+.pattern-diagonal-faded,
+.pattern-stripes-faded,
+.pattern-dense-dots-faded,
+.pattern-boxes-faded {
   position: relative;
   z-index: 0;
 }
-.pattern-grid-faded::before {
+
+.pattern-grid-faded::before,
+.pattern-dots-faded::before,
+.pattern-cross-faded::before,
+.pattern-diagonal-faded::before,
+.pattern-stripes-faded::before,
+.pattern-dense-dots-faded::before,
+.pattern-boxes-faded::before {
   content: "";
   position: absolute;
   top: 0;
@@ -298,10 +309,52 @@ a {
   bottom: 0;
   z-index: -1;
   pointer-events: none;
+}
+
+/* 1. Standard Grid (Home) */
+.pattern-grid-faded::before {
   background-image: 
     linear-gradient(var(--pattern-color) 2px, transparent 2px),
     linear-gradient(90deg, var(--pattern-color) 2px, transparent 2px);
   background-size: 40px 40px;
+}
+
+/* 2. Big Dots (Pricing) */
+.pattern-dots-faded::before {
+  background-image: radial-gradient(var(--pattern-color) 3px, transparent 3px);
+  background-size: 30px 30px;
+}
+
+/* 3. Cross / X (Blog) */
+.pattern-cross-faded::before {
+  background-image: 
+    linear-gradient(45deg, var(--pattern-color) 2px, transparent 2px),
+    linear-gradient(-45deg, var(--pattern-color) 2px, transparent 2px);
+  background-size: 40px 40px;
+}
+
+/* 4. Diagonal Lines (Changelog) */
+.pattern-diagonal-faded::before {
+  background-image: repeating-linear-gradient(45deg, var(--pattern-color) 0, var(--pattern-color) 2px, transparent 2px, transparent 30px);
+}
+
+/* 5. Horizontal Stripes (Contact) */
+.pattern-stripes-faded::before {
+  background-image: repeating-linear-gradient(0deg, var(--pattern-color) 0, var(--pattern-color) 2px, transparent 2px, transparent 40px);
+}
+
+/* 6. Dense Dots Matrix (Roadmap) */
+.pattern-dense-dots-faded::before {
+  background-image: radial-gradient(var(--pattern-color) 2px, transparent 2px);
+  background-size: 15px 15px;
+}
+
+/* 7. Big Boxes (Documentation) */
+.pattern-boxes-faded::before {
+  background-image: 
+    linear-gradient(var(--pattern-color) 4px, transparent 4px),
+    linear-gradient(90deg, var(--pattern-color) 4px, transparent 4px);
+  background-size: 80px 80px;
 }
 
 /* Hero Section Mask */
@@ -310,11 +363,71 @@ a {
   -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
 }
 
+/* Announcement Bar & Navbar Positioning */
+.announcement-bar {
+  background-color: var(--accent-red);
+  color: #000;
+  padding: 10px 40px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.9rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 3px solid var(--border-color);
+  box-shadow: 0 4px 0 rgba(0,0,0,1);
+}
+
+.announcement-link {
+  color: #000;
+  text-decoration: underline;
+}
+
+.announcement-close {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #000;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-wrapper {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
+  transition: top 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.navbar-wrapper.with-announcement {
+  top: 60px;
+}
+
 @media (max-width: 768px) {
   .show-on-mobile {
     display: block !important;
   }
   .mobile-menu-btn {
     display: flex !important;
+  }
+  
+  .announcement-bar {
+    padding: 10px 32px 10px 12px;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.75rem;
+  }
+  .navbar-wrapper.with-announcement {
+    top: 72px; /* Adjust for taller multi-line wrapped announcement */
   }
 }

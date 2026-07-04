@@ -15,7 +15,7 @@ export function Home() {
         entries.forEach((entry) => {
           const video = entry.target as HTMLVideoElement;
           if (entry.isIntersecting) {
-            video.play().catch(() => {});
+            video.play().catch(() => { });
           } else {
             video.pause();
           }
@@ -45,7 +45,7 @@ export function Home() {
 
 
       {/* Hero Section */}
-      <main className="pattern-grid-faded hero-mask" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '160px 0 60px', overflow: 'hidden' }}>
+      <main className="pattern-grid-faded hero-mask" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '180px 0 60px', overflow: 'hidden' }}>
         <div className="container flex-col-mobile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '32px' }}>
 
           <motion.div

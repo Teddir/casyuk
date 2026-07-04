@@ -6,13 +6,13 @@ import { blogs } from '../data/blogs';
 export function Blog() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredBlogs = blogs.filter(post => 
-    post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredBlogs = blogs.filter(post =>
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="pattern-grid-faded hero-mask" style={{ padding: '160px 0 120px' }}>
+    <div className="pattern-cross-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container" style={{ maxWidth: '1000px' }}>
 
         <div style={{ marginBottom: '60px', display: 'flex', flexWrap: 'wrap', gap: '32px', justifyContent: 'space-between', alignItems: 'flex-end' }}>
@@ -22,9 +22,9 @@ export function Blog() {
           </div>
           <div style={{ position: 'relative', width: '100%', maxWidth: '350px' }}>
             <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-            <input 
-              type="text" 
-              placeholder="Search blogs..." 
+            <input
+              type="text"
+              placeholder="Search blogs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{

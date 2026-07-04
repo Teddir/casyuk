@@ -45,30 +45,12 @@ export function MainLayout() {
 
       {/* Announcement Bar */}
       {showAnnouncement && (
-        <div style={{
-          backgroundColor: 'var(--accent-red)',
-          color: '#000',
-          padding: '10px 40px',
-          textAlign: 'center',
-          fontWeight: 800,
-          fontSize: '0.9rem',
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1001,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '12px',
-          borderBottom: '3px solid var(--border-color)',
-          boxShadow: '0 4px 0 rgba(0,0,0,1)'
-        }}>
+        <div className="announcement-bar">
           <span>🚀 LAUNCH PROMO: Get CasYuk Professional for just $5 (66% OFF!)</span>
-          <Link to="/pricing" style={{ color: '#000', textDecoration: 'underline' }}>Claim Now</Link>
+          <Link to="/pricing" className="announcement-link">Claim Now</Link>
           <button 
             onClick={() => setShowAnnouncement(false)} 
-            style={{ position: 'absolute', right: '16px', background: 'none', border: 'none', color: '#000', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            className="announcement-close"
             aria-label="Close Announcement"
           >
             <X size={20} strokeWidth={3} />
@@ -77,7 +59,7 @@ export function MainLayout() {
       )}
 
       {/* Navigation */}
-      <div style={{ position: 'fixed', top: showAnnouncement ? '60px' : '20px', left: '20px', right: '20px', zIndex: 1000, transition: 'top 0.3s cubic-bezier(0.25, 1, 0.5, 1)' }}>
+      <div className={`navbar-wrapper ${showAnnouncement ? 'with-announcement' : ''}`}>
         <nav className="navbar-pill">
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '800', fontSize: '1.5rem', letterSpacing: '-0.5px' }}>
             <img src="/casyuk-logo.png" alt="CasYuk Logo" style={{ width: '36px', height: '36px' }} />
