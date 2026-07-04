@@ -77,8 +77,11 @@ function App() {
       setShowOnboarding(true);
     }
   }, []);
-  // Auto-Update Check (Runs on startup & every 12 hours)
+  // Auto-Update Check (Runs on startup & every 12 hours) - ONLY FOR PRO USERS
   useEffect(() => {
+    // Jika bukan user Pro (belum memasukkan license key), jangan cek update sama sekali.
+    if (!isPro) return;
+
     const runUpdateCheck = async () => {
       try {
         const update = await check();
@@ -101,7 +104,7 @@ function App() {
       clearTimeout(initialTimer);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [isPro]);
 
   const handleInstallUpdate = async () => {
     if (!pendingUpdate) return;
