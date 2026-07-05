@@ -28,7 +28,7 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
   const [cardVisible, setCardVisible] = useState(false);
 
   useEffect(() => {
-    // Delay the appearance of the Glassmorphism card by 3 seconds
+    // Delay the appearance of the Alert card by 3 seconds
     const timer = setTimeout(() => {
       setCardVisible(true);
     }, 3000);
@@ -218,34 +218,53 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
         }}
       />
 
-      {/* Glassmorphism Card */}
+      {/* Neo-Brutalist Card */}
       {showGlassCard && (
         <div
-          className="glass-card"
+          className="neo-card"
           style={{
             position: 'relative',
             zIndex: 100,
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            animation: 'none',
+            backgroundColor: isCritical ? 'var(--accent-red)' : 'var(--accent-yellow)',
+            padding: '2.5rem',
+            textAlign: 'center',
+            maxWidth: '450px',
+            width: '90%',
             opacity: cardVisible ? 1 : 0,
             transform: cardVisible ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(20px)',
             transition: 'opacity 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            pointerEvents: cardVisible ? 'auto' : 'none'
+            pointerEvents: cardVisible ? 'auto' : 'none',
+            border: '4px solid var(--border-color)',
+            boxShadow: '8px 8px 0px var(--border-color)',
+            borderRadius: '16px'
           }}
         >
-          <h1 className="alert-title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: '#ffffff', textShadow: '0 2px 10px rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem' }}>
-            {cardTitle ? cardTitle : isCritical ? <><AlertTriangle size={36} /> CRITICAL BATTERY!</> : <><BatteryWarning size={36} /> Battery Low</>}
+          <h1 className="alert-title" style={{ fontSize: '2.2rem', marginBottom: '1rem', color: 'var(--text-main)', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '-1px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem' }}>
+            {cardTitle ? cardTitle : isCritical ? <><AlertTriangle size={36} strokeWidth={3} /> CRITICAL!</> : <><BatteryWarning size={36} strokeWidth={3} /> LOW BATTERY</>}
           </h1>
-          <p className="alert-message" style={{ fontSize: '1.4rem', color: 'rgba(255,255,255,0.95)', marginBottom: '0.5rem' }}>
-            Your battery is at <strong style={{ fontSize: '1.8rem', color: isCritical ? '#ff3b30' : '#4cd964', textShadow: '0 2px 5px rgba(0,0,0,0.5)' }}>{percentage}%</strong>.
+          <p className="alert-message" style={{ fontSize: '1.4rem', color: 'var(--text-main)', fontWeight: '700', marginBottom: '1rem' }}>
+            Capacity is at <strong style={{ fontSize: '1.8rem', backgroundColor: 'var(--text-main)', color: isCritical ? 'var(--accent-red)' : 'var(--accent-yellow)', padding: '2px 12px', borderRadius: '4px', border: '2px solid var(--border-color)' }}>{percentage}%</strong>
           </p>
-          <p className="alert-submessage" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
+          <p className="alert-submessage" style={{ color: 'var(--text-main)', fontWeight: '600', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
             {cardMessage || (isCritical
-              ? 'Please plug in your charger immediately before your device dies!'
+              ? 'Plug in your charger immediately before your device dies!'
               : 'Consider plugging in your charger soon.')}
           </p>
-          <button className="dismiss-btn glass-btn" onClick={onDismiss}>
-            I understand
+          <button
+            className="text-btn"
+            style={{
+              fontSize: '1.1rem',
+              padding: '0.8rem 2.5rem',
+              backgroundColor: 'var(--text-main)',
+              color: 'var(--card-bg)',
+              border: '2px solid var(--border-color)',
+              boxShadow: '4px 4px 0px var(--border-color)',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}
+            onClick={onDismiss}
+          >
+            I UNDERSTAND
           </button>
         </div>
       )}

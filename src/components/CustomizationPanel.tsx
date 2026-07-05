@@ -354,7 +354,7 @@ export function CustomizationPanel({ isPro = false, onUpgradeClick }: Customizat
 
         <div className="widget-card">
           <div className="widget-header">
-            <h3>Glassmorphism Card Content</h3>
+            <h3>Alert Card Content</h3>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <button onClick={handleResetCard} className="text-btn" style={{ background: 'var(--accent-red)', padding: '4px 12px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <RotateCcw size={14} /> Reset

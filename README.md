@@ -35,7 +35,7 @@ By utilizing dynamic, high-quality **green-screen (chroma-key) video overlays**,
 *   🌍 **True Cross-Platform**: Native battery telemetry on **macOS (IOKit)**, **Windows (WMI)**, and **Linux (UPower/Sysfs)**.
 *   🎭 **Chroma-Key Video Engine (Pro)**: Replaces boring push notifications with transparent, high-fidelity video overlays that demand attention.
 *   ⚡ **Smart Charge Limiter**: Automatically stops charging at 80% to preserve battery cell chemistry (hardware dependent).
-*   🎛️ **Granular Customization**: Full control over your alert experience with independent toggles for system notifications, video audio, custom sound alerts, and UI glassmorphism visibility.
+*   🎛️ **Granular Customization**: Full control over your alert experience with independent toggles for system notifications, video audio, custom sound alerts, and UI Alert Card visibility.
 *   🛡️ **Self-Healing Media**: Robust fallback architecture that automatically reverts to default assets if custom-uploaded media is moved, renamed, or deleted.
 *   📊 **Behavioral Analytics**: Tracks success metrics (*time to response after notification*, *plug rate*) to validate the emotional trigger's effectiveness.
 *   🚀 **Insanely Fast & Lightweight**: Powered by Tauri v2 and Rust with aggressive canvas downscaling and frame-throttling to minimize CPU/RAM overhead during intense alerts.
