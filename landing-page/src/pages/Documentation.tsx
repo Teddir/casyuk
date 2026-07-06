@@ -73,7 +73,7 @@ export function Documentation() {
             </div>
             <h4 style={{ fontSize: '1.2rem', marginBottom: '8px', color: 'var(--text-main)' }}>Windows (PowerShell)</h4>
             <div style={{ backgroundColor: '#000', color: '#fff', padding: '16px', borderRadius: '8px', border: '2px solid var(--border-color)' }}>
-              <code style={{ fontSize: '0.9rem', color: 'var(--accent-blue)', wordBreak: 'break-all' }}>iwr -useb https://casyuk.com/install.ps1 | iex</code>
+              <code style={{ fontSize: '0.9rem', color: 'var(--accent-blue)', wordBreak: 'break-all' }}>irm https://www.casyuk.com/install.ps1 | iex</code>
             </div>
           </div>
 

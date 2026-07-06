@@ -354,7 +354,7 @@ export function Home() {
                 <div className="neo-box" style={{ backgroundColor: '#111', borderColor: 'var(--accent-blue)', color: '#fff', padding: '24px' }}>
                   <h3 style={{ fontSize: '1.2rem', marginBottom: '12px' }}>Windows</h3>
                   <code style={{ display: 'block', backgroundColor: '#000', padding: '16px', borderRadius: '8px', color: 'var(--accent-blue)', border: '2px solid #333', fontSize: '0.9rem', wordBreak: 'break-all' }}>
-                    iwr -useb casyuk.com/install.ps1 | iex
+                    irm https://www.casyuk.com/install.ps1 | iex
                   </code>
                 </div>
               </div>

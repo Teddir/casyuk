@@ -52,7 +52,7 @@ curl -fsSL https://casyuk.com/install.sh | bash
 
 ### Windows
 ```powershell
-iwr -useb https://casyuk.com/install.ps1 | iex
+irm https://www.casyuk.com/install.ps1 | iex
 ```
 
 > *Alternatively: Download the installers directly from our [Releases Page](https://github.com/Teddir/casyuk/releases/latest).*
