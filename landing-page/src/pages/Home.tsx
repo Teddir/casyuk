@@ -393,6 +393,36 @@ export function Home() {
         </div>
       </section>
 
+      {/* Launch Badges Section */}
+      <section style={{ padding: '80px 0', backgroundColor: 'var(--card-bg)', textAlign: 'center', borderTop: '3px solid var(--border-color)' }}>
+        <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <h2 style={{ fontSize: '2.5rem', margin: 0, letterSpacing: '-0.03em' }}>Support our Launches 🚀</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', margin: 0, maxWidth: '600px', marginBottom: '24px' }}>
+            CasYuk is live across multiple platforms! If you enjoy keeping your laptop's battery healthy with memes, we'd love your support.
+          </p>
+          
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <a href="https://www.producthunt.com/products/casyuk?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-casyuk" target="_blank" rel="noopener noreferrer">
+                <img alt="CasYuk - Emotional battery management with 80% limit & meme alerts. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1190296&theme=light&t=1783435878634" style={{ borderRadius: '8px' }} />
+              </a>
+            </motion.div>
+            
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <a href="https://smollaunch.com" target="_blank" rel="noopener noreferrer">
+                <img src="https://smollaunch.com/badges/featured.svg" alt="CasYuk — Featured on Smol Launch" loading="lazy" width="250" height="60" style={{ borderRadius: '8px' }} />
+              </a>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
     </>
   );
 }
