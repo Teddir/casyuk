@@ -58,6 +58,7 @@ async fn validate_license(key: String, instance_name: String) -> Result<bool, St
     // Use /activate instead of /validate to actually consume a seat limit!
     let dodo_live = client
         .post("https://live.dodopayments.com/licenses/activate")
+        .header("Authorization", format!("Bearer {}", env!("DODO_PAYMENTS_LIVE_API_KEY")))
         .json(&serde_json::json!({ 
             "license_key": key.clone(),
             "name": instance_name.clone()
@@ -80,6 +81,7 @@ async fn validate_license(key: String, instance_name: String) -> Result<bool, St
     // --- 2. TRY DODO PAYMENTS (TEST MODE) ---
     let dodo_test = client
         .post("https://test.dodopayments.com/licenses/activate")
+        .header("Authorization", format!("Bearer {}", env!("DODO_PAYMENTS_TEST_API_KEY")))
         .json(&serde_json::json!({ 
             "license_key": key.clone(),
             "name": instance_name.clone()

@@ -12,7 +12,7 @@ import { getVersion } from '@tauri-apps/api/app';
 import { check, Update } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { load } from '@tauri-apps/plugin-store';
-import { LayoutDashboard, Battery, Palette, Settings, Zap, Moon, Sun, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, Crown, Mail } from 'lucide-react';
+import { LayoutDashboard, Battery, Palette, Settings, Zap, Moon, Sun, ChevronLeft, ChevronRight, Plug, CheckCircle2, Film, PanelLeft, Globe, Crown, Mail, Loader2 } from 'lucide-react';
 import { openUrl } from '@tauri-apps/plugin-opener';
 import { LicenseModal } from './components/LicenseModal';
 import './App.css';
@@ -549,44 +549,78 @@ function App() {
 
         {/* Update Modal */}
         {pendingUpdate && (
-          <div className="modal-overlay">
-            <div className="modal neo-brutalist">
-              <h2 className="title" style={{ fontSize: '1.5rem', marginBottom: '16px' }}>New Version Available! 🚀</h2>
-              <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>
-                CasYuk version <strong style={{ color: 'var(--primary)' }}>{pendingUpdate.version}</strong> is ready to install.
-              </p>
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            backdropFilter: 'blur(5px)'
+          }}>
+            <div className="neo-card" style={{
+              width: '450px',
+              maxWidth: '90%',
+              padding: '2rem',
+              animation: 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                <div style={{
+                  width: '60px', height: '60px', borderRadius: '50%',
+                  background: 'var(--accent-blue)', margin: '0 auto 1rem',
+                  display: 'flex', justifyContent: 'center', alignItems: 'center'
+                }}>
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" x2="12" y1="15" y2="3" />
+                  </svg>
+                </div>
+                <h2 style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>New Version Available! 🚀</h2>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                  CasYuk version <strong style={{ color: 'var(--primary)', fontWeight: '800' }}>{pendingUpdate.version}</strong> is ready to install.
+                </p>
+              </div>
 
               {pendingUpdate.body && (
                 <div style={{
                   backgroundColor: 'var(--card-bg)',
                   border: '2px solid var(--border-color)',
-                  borderRadius: '4px',
+                  boxShadow: 'inset 2px 2px 0px rgba(0,0,0,0.1)',
+                  borderRadius: '8px',
                   padding: '12px',
-                  marginBottom: '24px',
+                  marginBottom: '1.5rem',
                   maxHeight: '150px',
                   overflowY: 'auto',
                   fontSize: '0.9rem',
                   whiteSpace: 'pre-wrap',
-                  textAlign: 'left'
+                  textAlign: 'left',
+                  color: 'var(--text-main)'
                 }}>
                   {pendingUpdate.body}
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', gap: '1rem' }}>
                 <button
-                  className="btn btn-secondary"
+                  className="text-btn"
                   onClick={() => setPendingUpdate(null)}
                   disabled={isUpdating}
+                  style={{ flex: 1, background: 'var(--primary-color)', padding: '0.8rem' }}
                 >
-                  Remind Me Later
+                  Remind Later
                 </button>
                 <button
-                  className="btn btn-primary"
+                  className="text-btn"
                   onClick={handleInstallUpdate}
                   disabled={isUpdating}
+                  style={{ flex: 1, background: 'var(--accent-green)', padding: '0.8rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
                 >
-                  {isUpdating ? 'Installing...' : 'Update & Restart'}
+                  {isUpdating ? <Loader2 size={18} className="animate-spin" /> : 'Update & Restart'}
                 </button>
               </div>
             </div>
