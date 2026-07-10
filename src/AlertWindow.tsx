@@ -6,6 +6,7 @@ import { load } from '@tauri-apps/plugin-store';
 import { AlertOverlay } from './components/AlertOverlay';
 import { convertFileSrc, invoke } from '@tauri-apps/api/core';
 import { useBattery } from './hooks/useBattery';
+import { getBankVideoSrc } from './lib/videoBank';
 import './App.css';
 
 interface AlertData {
@@ -22,6 +23,7 @@ export function AlertWindow() {
   const [enableSystemNotification, setEnableSystemNotification] = useState(false);
   const [enableAudioAlert, setEnableAudioAlert] = useState(true);
   const [enableVideoAudio, setEnableVideoAudio] = useState(true);
+  const [showGlassCard, setShowGlassCard] = useState(true);
 
   const [isExiting, setIsExiting] = useState(false);
 
@@ -81,12 +83,14 @@ export function AlertWindow() {
         const savedSysNotif = await store.get<{ value: boolean }>('enable_system_notification');
         const savedAudio = await store.get<{ value: boolean }>('enable_audio_alert');
         const savedVideoAudio = await store.get<{ value: boolean }>('enable_video_audio');
+        const savedShowCard = await store.get<{ value: boolean }>('show_glass_card');
         
         setActiveVideoId(savedId?.value || 'default');
         
         setEnableSystemNotification(savedSysNotif ? savedSysNotif.value : false);
         setEnableAudioAlert(savedAudio ? savedAudio.value : true);
         setEnableVideoAudio(savedVideoAudio ? savedVideoAudio.value : true);
+        setShowGlassCard(savedShowCard ? savedShowCard.value : true);
 
         if (savedVid && savedVid.value) {
           if (savedVid.value.startsWith('http')) {
@@ -94,6 +98,10 @@ export function AlertWindow() {
           } else {
             setCustomVideoUrl(convertFileSrc(savedVid.value));
           }
+        } else if (savedId && savedId.value) {
+          const bankSrc = getBankVideoSrc(savedId.value);
+          if (bankSrc) setCustomVideoUrl(bankSrc);
+          else setCustomVideoUrl(null);
         } else {
           setCustomVideoUrl(null);
         }
@@ -122,6 +130,10 @@ export function AlertWindow() {
     const unlisten = listen<string>('trigger-alert', async (event) => {
       try {
         const payload = JSON.parse(event.payload) as AlertData;
+        
+        // Load latest settings BEFORE showing the alert to prevent stale video/audio
+        const videoId = await loadSettings();
+        
         setActiveAlert(payload);
         setIsExiting(false);
 
@@ -131,13 +143,11 @@ export function AlertWindow() {
         await appWindow.show();
         await appWindow.setFocus();
 
-        // Update settings in background for next time and track event
-        loadSettings().then(videoId => {
-          invoke('plugin:aptabase|track_event', {
-            name: 'alert_shown',
-            props: { percentage: payload.percentage, video_id: videoId, is_test: false }
-          }).catch(console.error);
-        });
+        // Track event
+        invoke('plugin:aptabase|track_event', {
+          name: 'alert_shown',
+          props: { percentage: payload.percentage, video_id: videoId, is_test: false }
+        }).catch(console.error);
 
         if (enableSystemNotification) {
           await safeSendNotification(
@@ -152,6 +162,9 @@ export function AlertWindow() {
 
     // Listen for testing button dispatch from the main window
     const unlistenTest = listen<AlertData>('test-alert-event', async (event) => {
+      // Load latest settings BEFORE showing the alert to prevent stale video/audio
+      const videoId = await loadSettings();
+
       setActiveAlert(event.payload);
       setIsExiting(false);
       
@@ -160,12 +173,10 @@ export function AlertWindow() {
       await appWindow.show();
       await appWindow.setFocus();
 
-      loadSettings().then(videoId => {
-        invoke('plugin:aptabase|track_event', {
-          name: 'alert_shown',
-          props: { percentage: event.payload.percentage, video_id: videoId, is_test: true }
-        }).catch(console.error);
-      });
+      invoke('plugin:aptabase|track_event', {
+        name: 'alert_shown',
+        props: { percentage: event.payload.percentage, video_id: videoId, is_test: true }
+      }).catch(console.error);
 
       if (enableSystemNotification) {
         await safeSendNotification(
@@ -211,6 +222,7 @@ export function AlertWindow() {
         customAudioUrl={customAudioUrl}
         enableAudioAlert={enableAudioAlert}
         enableVideoAudio={enableVideoAudio}
+        showGlassCard={showGlassCard}
       />
     </div>
   );

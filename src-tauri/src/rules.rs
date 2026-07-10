@@ -1,8 +1,6 @@
 use tauri::{AppHandle, Emitter, Manager};
 use std::time::{Duration, Instant};
 use std::sync::Mutex;
-use tauri_plugin_store::StoreExt;
-
 pub struct CooldownState {
     pub last_alert: Option<Instant>,
 }

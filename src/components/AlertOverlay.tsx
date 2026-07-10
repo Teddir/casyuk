@@ -10,16 +10,16 @@ interface AlertOverlayProps {
   customAudioUrl?: string | null;
   enableAudioAlert?: boolean;
   enableVideoAudio?: boolean;
+  showGlassCard?: boolean;
 }
 
-export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl: _customVideoUrl, customAudioUrl: _customAudioUrl, enableAudioAlert = true, enableVideoAudio = true }: AlertOverlayProps) {
+export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl: _customVideoUrl, customAudioUrl: _customAudioUrl, enableAudioAlert = true, enableVideoAudio = true, showGlassCard = true }: AlertOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // We rely entirely on the props passed from AlertWindow to prevent stuttering/double fetching.
   const [videoUrl, setVideoUrl] = useState<string | null>(_customVideoUrl || null);
   const [audioUrl, setAudioUrl] = useState<string | null>(_customAudioUrl || null);
-  const showGlassCard = true; // Use default for now or pass as prop if needed
   const cardTitle = '';
   const cardMessage = '';
   const [cardVisible, setCardVisible] = useState(false);
@@ -112,26 +112,41 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
     };
   }, []);
 
-  // Force video reload and play when source changes
+  // Auto-play is handled by the video tag attribute.
+  // We removed video.load() because it aborts the initial buffering and causes a stutter/lag on start.
   useEffect(() => {
     const video = videoRef.current;
-    if (video) {
-      video.load();
+    if (video && video.paused) {
       video.play().catch(e => console.error("Auto-play prevented", e));
     }
-  }, [videoUrl]);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onDismiss();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [videoUrl, onDismiss]);
 
   return (
-    <div className={`alert-overlay`} style={{
-      position: 'relative',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'transparent',
-      overflow: 'hidden'
-    }}>
+    <div 
+      className={`alert-overlay`} 
+      onClick={() => {
+        if (!showGlassCard) onDismiss();
+      }}
+      style={{
+        position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'transparent',
+        overflow: 'hidden',
+        cursor: !showGlassCard ? 'pointer' : 'default'
+      }}
+    >
       {/* Hidden Original Video */}
       <video
         ref={videoRef}
@@ -173,7 +188,6 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
           width: '100%',
           height: '100%',
           zIndex: -1,
-          opacity: 0.9,
           objectFit: 'cover'
         }}
       />
