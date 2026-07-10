@@ -25,10 +25,10 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
   const [cardVisible, setCardVisible] = useState(false);
 
   useEffect(() => {
-    // Delay the appearance of the Alert card by 3 seconds
+    // Delay the appearance of the Alert card by 5 seconds
     const timer = setTimeout(() => {
       setCardVisible(true);
-    }, 3000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, []);
 
