@@ -52,10 +52,6 @@ fn apply_charging_settings(limit_80: bool, smart_discharge: bool) -> Result<(), 
 
 #[tauri::command]
 async fn validate_license(key: String, instance_name: String) -> Result<bool, String> {
-    if key == "TEST-PRO-KEY" {
-        return Ok(true);
-    }
-
     let client = reqwest::Client::new();
     
     // --- 1. TRY DODO PAYMENTS (LIVE MODE) ---

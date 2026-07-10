@@ -420,26 +420,29 @@ function App() {
               >
                 <span className="icon"><Crown size={18} /></span> {isSidebarOpen && 'Upgrade to Pro'}
               </button>
-            ) : (
-              <button
-                className="menu-item"
-                onClick={async () => {
-                  const store = await load('settings.json');
-                  await store.delete('is_pro_activated');
-                  await store.save();
-                  setIsPro(false);
-                  showToastMessage('Pro Plan Reset (Testing)');
-                }}
-                title="Downgrade to Free"
-                style={{
-                  color: '#000', fontWeight: 'bold',
-                  border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)',
-                  marginTop: '1rem'
-                }}
-              >
-                <span className="icon"><Crown size={18} /></span> {isSidebarOpen && 'Downgrade Plan'}
-              </button>
-            )}
+            ) :
+              null
+              // (
+              //   <button
+              //     className="menu-item"
+              //     onClick={async () => {
+              //       const store = await load('settings.json');
+              //       await store.delete('is_pro_activated');
+              //       await store.save();
+              //       setIsPro(false);
+              //       showToastMessage('Pro Plan Reset (Testing)');
+              //     }}
+              //     title="Downgrade to Free"
+              //     style={{
+              //       color: '#000', fontWeight: 'bold',
+              //       border: '2px solid var(--border-color)', boxShadow: '2px 2px 0px var(--border-color)',
+              //       marginTop: '1rem'
+              //     }}
+              //   >
+              //     <span className="icon"><Crown size={18} /></span> {isSidebarOpen && 'Downgrade Plan'}
+              //   </button>
+              // )
+            }
           </div>
 
           <div className="sidebar-footer">
@@ -552,11 +555,11 @@ function App() {
               <p style={{ marginBottom: '16px', color: 'var(--text-muted)' }}>
                 CasYuk version <strong style={{ color: 'var(--primary)' }}>{pendingUpdate.version}</strong> is ready to install.
               </p>
-              
+
               {pendingUpdate.body && (
-                <div style={{ 
-                  backgroundColor: 'var(--card-bg)', 
-                  border: '2px solid var(--border-color)', 
+                <div style={{
+                  backgroundColor: 'var(--card-bg)',
+                  border: '2px solid var(--border-color)',
                   borderRadius: '4px',
                   padding: '12px',
                   marginBottom: '24px',
@@ -571,15 +574,15 @@ function App() {
               )}
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-                <button 
-                  className="btn btn-secondary" 
+                <button
+                  className="btn btn-secondary"
                   onClick={() => setPendingUpdate(null)}
                   disabled={isUpdating}
                 >
                   Remind Me Later
                 </button>
-                <button 
-                  className="btn btn-primary" 
+                <button
+                  className="btn btn-primary"
                   onClick={handleInstallUpdate}
                   disabled={isUpdating}
                 >
