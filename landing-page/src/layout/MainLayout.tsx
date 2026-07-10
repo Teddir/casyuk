@@ -46,10 +46,10 @@ export function MainLayout() {
       {/* Announcement Bar */}
       {showAnnouncement && (
         <div className="announcement-bar">
-          <span>🚀 LAUNCH PROMO: Get CasYuk Professional for just $5 (66% OFF!)</span>
+          <span>🚀 LAUNCH PROMO: Get CasYuk Professional for just $5 (50% OFF!)</span>
           <Link to="/pricing" className="announcement-link">Claim Now</Link>
-          <button 
-            onClick={() => setShowAnnouncement(false)} 
+          <button
+            onClick={() => setShowAnnouncement(false)}
             className="announcement-close"
             aria-label="Close Announcement"
           >
@@ -74,7 +74,7 @@ export function MainLayout() {
               <Link to="/roadmap" style={{ fontWeight: 600, fontSize: '0.95rem' }}>Roadmap</Link>
               <Link to="/blog" style={{ fontWeight: 600, fontSize: '0.95rem' }}>Blog</Link>
             </div>
-            
+
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
               <button
                 onClick={() => setIsDark(!isDark)}
@@ -95,7 +95,7 @@ export function MainLayout() {
               >
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              
+
               <div className="hide-on-mobile">
                 <NeoButton href="https://github.com/Teddir/casyuk" target="_blank" rel="noreferrer" variant="secondary" style={{ padding: '8px 16px', fontSize: '0.9rem', borderRadius: '50px' }}>
                   <Code size={18} /> <span>GitHub</span>
@@ -103,7 +103,7 @@ export function MainLayout() {
               </div>
 
               {/* Mobile Menu Toggle */}
-              <button 
+              <button
                 className="mobile-menu-btn"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 style={{
@@ -126,20 +126,20 @@ export function MainLayout() {
 
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
-          <div style={{ 
-            position: 'absolute', 
-            top: '70px', 
-            left: '0', 
-            right: '0', 
-            background: 'var(--card-bg)', 
-            border: '2px solid var(--border-color)', 
-            borderRadius: '16px', 
-            padding: '24px', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '20px', 
+          <div style={{
+            position: 'absolute',
+            top: '70px',
+            left: '0',
+            right: '0',
+            background: 'var(--card-bg)',
+            border: '2px solid var(--border-color)',
+            borderRadius: '16px',
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px',
             boxShadow: '4px 4px 0px var(--border-color)',
-            zIndex: 999 
+            zIndex: 999
           }}>
             <Link to="/#features" style={{ fontWeight: 700, fontSize: '1.2rem', textDecoration: 'none', color: 'var(--text-main)' }}>Features</Link>
             <Link to="/#showcase" style={{ fontWeight: 700, fontSize: '1.2rem', textDecoration: 'none', color: 'var(--text-main)' }}>Showcase</Link>
