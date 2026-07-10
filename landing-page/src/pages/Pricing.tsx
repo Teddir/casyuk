@@ -1,8 +1,34 @@
 import { Check, X, HelpCircle } from 'lucide-react';
 import { NeoButton } from '../components/NeoButton';
+import { useState } from 'react';
+
+const PAYMENT_LINKS: Record<string, { dodo: string, lemon: string }> = {
+  Professional: {
+    dodo: "https://test.checkout.dodopayments.com/buy/pdt_0NiqyoSJwCz4jpFxPNKSb?quantity=1",
+    lemon: "#"
+  },
+  'Power User': {
+    dodo: "#", // Update with Dodo Power User link later
+    lemon: "#"
+  },
+  Team: {
+    dodo: "#", // Update with Dodo Team link later
+    lemon: "#"
+  }
+};
 
 export function Pricing() {
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+
+  const openModal = (e: React.MouseEvent, plan: string) => {
+    e.preventDefault();
+    setSelectedPlan(plan);
+  };
+
+  const closeModal = () => setSelectedPlan(null);
+
   return (
+    <>
     <div className="pattern-dots-faded hero-mask" style={{ padding: '180px 0 120px' }}>
       <div className="container">
 
@@ -44,7 +70,7 @@ export function Pricing() {
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Meme Overlays</span></div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Smart 80% Limit</span></div>
             </div>
-            <NeoButton href="#" style={{ width: '100%', backgroundColor: '#000', color: '#fff' }}>Get License</NeoButton>
+            <NeoButton href="#" onClick={(e) => openModal(e, 'Professional')} style={{ width: '100%', backgroundColor: '#000', color: '#fff' }}>Get Professional</NeoButton>
           </div>
 
           {/* Power User */}
@@ -61,7 +87,7 @@ export function Pricing() {
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Everything in Professional</span></div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Up to 3 Devices</span></div>
             </div>
-            <NeoButton href="#" style={{ width: '100%', backgroundColor: '#000', color: 'var(--accent-green)' }}>Get Power User</NeoButton>
+            <NeoButton href="#" onClick={(e) => openModal(e, 'Power User')} style={{ width: '100%', backgroundColor: '#000', color: 'var(--accent-green)' }}>Get Power User</NeoButton>
           </div>
 
           {/* Team */}
@@ -78,7 +104,7 @@ export function Pricing() {
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Lifetime Updates</span></div>
               <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}><Check size={18} strokeWidth={3} /> <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Priority Support</span></div>
             </div>
-            <NeoButton href="#" style={{ width: '100%', backgroundColor: '#000', color: '#fff' }}>Get Team License</NeoButton>
+            <NeoButton href="#" onClick={(e) => openModal(e, 'Team')} style={{ width: '100%', backgroundColor: '#000', color: '#fff' }}>Get Team License</NeoButton>
           </div>
 
         </div>
@@ -180,5 +206,52 @@ export function Pricing() {
 
       </div>
     </div>
+
+    {/* Payment Merchant Selection Modal */}
+    {selectedPlan && (
+      <div style={{
+        position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+        display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999
+      }} onClick={closeModal}>
+        <div className="neo-box" style={{
+          backgroundColor: 'var(--card-bg)', width: '90%', maxWidth: '400px',
+          padding: '32px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '24px'
+        }} onClick={e => e.stopPropagation()}>
+          <h3 style={{ fontSize: '2rem', margin: 0, fontWeight: 900 }}>Get {selectedPlan}</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontWeight: 600 }}>Choose your preferred merchant to complete the purchase.</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '8px' }}>
+            <NeoButton href={PAYMENT_LINKS[selectedPlan]?.dodo} style={{ 
+              width: '100%', backgroundColor: '#000', color: '#fff', 
+              fontSize: '1.1rem', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' 
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 7V17H13.5C15.9853 17 18 14.7614 18 12C18 9.23858 15.9853 7 13.5 7H8Z" stroke="#00D084" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Buy via Dodo Payments
+            </NeoButton>
+            
+            <NeoButton href={PAYMENT_LINKS[selectedPlan]?.lemon} variant="secondary" style={{ 
+              width: '100%', backgroundColor: '#7047EB', color: '#fff', border: '3px solid #000',
+              fontSize: '1.1rem', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' 
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14.5 3.5C14.5 3.5 19 3 20 4C21 5 20.5 9.5 20.5 9.5C20.5 9.5 22 14.5 18 18.5C14 22.5 9.5 21 9.5 21C9.5 21 4.5 20.5 3.5 19.5C2.5 18.5 3 14 3 14C3 14 2.5 9 6.5 5C10.5 1 14.5 3.5 14.5 3.5Z" fill="#FFC233" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Buy via Lemon Squeezy
+            </NeoButton>
+          </div>
+          
+          <button 
+            onClick={closeModal} 
+            style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', textDecoration: 'underline', cursor: 'pointer', marginTop: '16px', fontWeight: 800, fontSize: '1rem' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    )}
+    </>
   );
 }

@@ -1,9 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import mascotVideo from '../assets/mascot/0629.mp4';
-import { load } from '@tauri-apps/plugin-store';
-import { convertFileSrc } from '@tauri-apps/api/core';
 import { AlertTriangle, BatteryWarning } from 'lucide-react';
-import { getBankVideoSrc } from '../lib/videoBank';
 
 interface AlertOverlayProps {
   percentage: number;
@@ -19,12 +16,12 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Customization State
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [showGlassCard, setShowGlassCard] = useState(true);
-  const [cardTitle, setCardTitle] = useState('');
-  const [cardMessage, setCardMessage] = useState('');
+  // We rely entirely on the props passed from AlertWindow to prevent stuttering/double fetching.
+  const [videoUrl, setVideoUrl] = useState<string | null>(_customVideoUrl || null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(_customAudioUrl || null);
+  const showGlassCard = true; // Use default for now or pass as prop if needed
+  const cardTitle = '';
+  const cardMessage = '';
   const [cardVisible, setCardVisible] = useState(false);
 
   useEffect(() => {
@@ -33,43 +30,6 @@ export function AlertOverlay({ percentage, isCritical, onDismiss, customVideoUrl
       setCardVisible(true);
     }, 3000);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    async function fetchSettings() {
-      try {
-        const store = await load('settings.json');
-
-        const savedVid = await store.get<{ value: string }>('custom_video_path');
-        const savedId = await store.get<{ value: string }>('custom_video_id');
-        const savedAud = await store.get<{ value: string }>('custom_audio_path');
-        const savedShowCard = await store.get<{ value: boolean }>('show_glass_card');
-        const savedTitle = await store.get<{ value: string }>('card_title');
-        const savedMessage = await store.get<{ value: string }>('card_message');
-
-        // Priority: 1. Custom Local File, 2. Bundled Video Bank ID, 3. Default Mascot
-        if (savedVid?.value) {
-          setVideoUrl(convertFileSrc(savedVid.value));
-        } else if (savedId?.value) {
-          const bankSrc = getBankVideoSrc(savedId.value);
-          if (bankSrc) setVideoUrl(bankSrc);
-        }
-
-        if (savedAud?.value) {
-          if (savedAud.value.startsWith('http')) {
-            setAudioUrl(savedAud.value);
-          } else {
-            setAudioUrl(convertFileSrc(savedAud.value));
-          }
-        }
-        if (savedShowCard !== null && savedShowCard !== undefined) setShowGlassCard(savedShowCard.value);
-        if (savedTitle?.value) setCardTitle(savedTitle.value);
-        if (savedMessage?.value) setCardMessage(savedMessage.value);
-      } catch (err) {
-        console.error("Failed to load settings:", err);
-      }
-    }
-    fetchSettings();
   }, []);
 
   useEffect(() => {

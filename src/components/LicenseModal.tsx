@@ -25,7 +25,7 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
 
     try {
       // Call Rust backend to validate with Lemon Squeezy API
-      const isValid = await invoke<boolean>('validate_license', { 
+      const isValid = await invoke<boolean>('validate_license', {
         key: licenseKey.trim(),
         instanceName: "CasYuk Desktop App"
       });
@@ -35,13 +35,13 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
         const store = await load('settings.json');
         await store.set('is_pro_activated', { value: true });
         await store.save();
-        
+
         // Track activation success
         invoke('plugin:aptabase|track_event', {
           name: 'pro_activated',
           props: {}
         }).catch(console.error);
-        
+
         onSuccess();
       } else {
         setError('License key is invalid.');
@@ -75,8 +75,8 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
         animation: 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ 
-            width: '60px', height: '60px', borderRadius: '50%', 
+          <div style={{
+            width: '60px', height: '60px', borderRadius: '50%',
             background: 'var(--accent-purple)', margin: '0 auto 1rem',
             display: 'flex', justifyContent: 'center', alignItems: 'center'
           }}>
@@ -90,8 +90,8 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
 
         <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>License Key</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="e.g. XXXX-XXXX-XXXX-XXXX"
             value={licenseKey}
             onChange={(e) => setLicenseKey(e.target.value)}
@@ -112,16 +112,16 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
         </div>
 
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <button 
-            className="text-btn" 
+          <button
+            className="text-btn"
             onClick={onCancel}
             style={{ flex: 1, background: 'var(--primary-color)', padding: '0.8rem' }}
             disabled={isLoading}
           >
             Cancel
           </button>
-          <button 
-            className="text-btn" 
+          <button
+            className="text-btn"
             onClick={handleActivate}
             style={{ flex: 1, background: 'var(--accent-green)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', padding: '0.8rem' }}
             disabled={isLoading}
@@ -129,9 +129,9 @@ export function LicenseModal({ onSuccess, onCancel }: LicenseModalProps) {
             {isLoading ? <Loader2 size={18} className="animate-spin" /> : <><CheckCircle2 size={18} /> Activate</>}
           </button>
         </div>
-        
+
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Don't have a license key? <a href="#" onClick={(e) => { e.preventDefault(); openUrl('https://casyuk.lemonsqueezy.com/buy/casyuk-pro'); }} style={{ color: 'var(--text-main)', textDecoration: 'underline', fontWeight: 'bold' }}>Get CasYuk Pro</a>
+          Don't have a license key? <a href="#" onClick={(e) => { e.preventDefault(); openUrl('https://www.casyuk.com/pricing'); }} style={{ color: 'var(--text-main)', textDecoration: 'underline', fontWeight: 'bold' }}>Get CasYuk Pro</a>
         </div>
       </div>
     </div>

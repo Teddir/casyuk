@@ -22,18 +22,24 @@ pub fn start_rule_engine(app: AppHandle) {
                 let mut low_threshold = 20;
                 let mut critical_threshold = 10;
                 
-                // Try to read settings from store
-                if let Ok(store) = app.store("settings.json") {
-                    if let Some(val) = store.get("low_threshold") {
-                        if let Some(obj) = val.as_object() {
-                            if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+                // Reliably read settings from disk since store.get might fail in background thread
+                if let Ok(app_dir) = app.path().app_data_dir() {
+                    let settings_path = app_dir.join("settings.json");
+                    if let Ok(content) = std::fs::read_to_string(&settings_path) {
+                        if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                            if let Some(obj) = json.get("low_threshold").and_then(|v| v.as_object()) {
+                                if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+                                    low_threshold = num as u8;
+                                }
+                            } else if let Some(num) = json.get("low_threshold").and_then(|v| v.as_u64()) {
                                 low_threshold = num as u8;
                             }
-                        }
-                    }
-                    if let Some(val) = store.get("critical_threshold") {
-                        if let Some(obj) = val.as_object() {
-                            if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+
+                            if let Some(obj) = json.get("critical_threshold").and_then(|v| v.as_object()) {
+                                if let Some(num) = obj.get("value").and_then(|v| v.as_u64()) {
+                                    critical_threshold = num as u8;
+                                }
+                            } else if let Some(num) = json.get("critical_threshold").and_then(|v| v.as_u64()) {
                                 critical_threshold = num as u8;
                             }
                         }

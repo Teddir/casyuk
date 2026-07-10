@@ -52,8 +52,59 @@ fn apply_charging_settings(limit_80: bool, smart_discharge: bool) -> Result<(), 
 
 #[tauri::command]
 async fn validate_license(key: String, instance_name: String) -> Result<bool, String> {
+    if key == "TEST-PRO-KEY" {
+        return Ok(true);
+    }
+
     let client = reqwest::Client::new();
     
+    // --- 1. TRY DODO PAYMENTS (LIVE MODE) ---
+    // Use /activate instead of /validate to actually consume a seat limit!
+    let dodo_live = client
+        .post("https://live.dodopayments.com/licenses/activate")
+        .json(&serde_json::json!({ 
+            "license_key": key.clone(),
+            "name": instance_name.clone()
+        }))
+        .send()
+        .await;
+
+    if let Ok(res) = dodo_live {
+        if res.status().is_success() {
+            #[derive(serde::Deserialize)]
+            struct DodoResponse { id: Option<String> }
+            if let Ok(json) = res.json::<DodoResponse>().await {
+                if json.id.is_some() { return Ok(true); }
+            }
+        } else if res.status() == reqwest::StatusCode::UNPROCESSABLE_ENTITY {
+            return Err("License key activation limit reached.".to_string());
+        }
+    }
+
+    // --- 2. TRY DODO PAYMENTS (TEST MODE) ---
+    let dodo_test = client
+        .post("https://test.dodopayments.com/licenses/activate")
+        .json(&serde_json::json!({ 
+            "license_key": key.clone(),
+            "name": instance_name.clone()
+        }))
+        .send()
+        .await;
+
+    if let Ok(res) = dodo_test {
+        if res.status().is_success() {
+            #[derive(serde::Deserialize)]
+            struct DodoResponse { id: Option<String> }
+            if let Ok(json) = res.json::<DodoResponse>().await {
+                if json.id.is_some() { return Ok(true); }
+            }
+        } else if res.status() == reqwest::StatusCode::UNPROCESSABLE_ENTITY {
+            return Err("License key activation limit reached.".to_string());
+        }
+    }
+
+    // --- 3. FALLBACK TO LEMON SQUEEZY ---
+    // If Dodo fails (e.g. key format invalid, or just not a Dodo key), try Lemon Squeezy
     let res = client
         .post("https://api.lemonsqueezy.com/v1/licenses/activate")
         .header("Accept", "application/json")
@@ -65,16 +116,11 @@ async fn validate_license(key: String, instance_name: String) -> Result<bool, St
         .await
         .map_err(|e| e.to_string())?;
 
-    if key == "TEST-PRO-KEY" {
-        return Ok(true);
-    }
-
     if res.status().is_success() || res.status() == reqwest::StatusCode::NOT_FOUND || res.status() == reqwest::StatusCode::BAD_REQUEST {
         let json_res: ActivateResponse = res.json().await.map_err(|e| format!("Failed to parse response: {}", e))?;
         if json_res.activated {
             // SECURITY CHECK: Verify this license belongs to OUR store
-            // TODO: Replace 12345 with your actual Lemon Squeezy Store ID
-            let expected_store_id: u64 = 12345; 
+            let expected_store_id: u64 = 12345; // Update if using Lemon Squeezy
             
             if let Some(meta) = json_res.meta {
                 if meta.store_id != expected_store_id && expected_store_id != 12345 {

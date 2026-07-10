@@ -115,10 +115,12 @@ export function AlertWindow() {
       }
     }
 
+    // Preload settings immediately when window is created
+    loadSettings();
+
     // Listen for alerts from Rust
     const unlisten = listen<string>('trigger-alert', async (event) => {
       try {
-        const videoId = await loadSettings(); // Reload settings right before showing
         const payload = JSON.parse(event.payload) as AlertData;
         setActiveAlert(payload);
         setIsExiting(false);
@@ -129,17 +131,20 @@ export function AlertWindow() {
         await appWindow.show();
         await appWindow.setFocus();
 
+        // Update settings in background for next time and track event
+        loadSettings().then(videoId => {
+          invoke('plugin:aptabase|track_event', {
+            name: 'alert_shown',
+            props: { percentage: payload.percentage, video_id: videoId, is_test: false }
+          }).catch(console.error);
+        });
+
         if (enableSystemNotification) {
           await safeSendNotification(
             payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
             `Battery is at ${payload.percentage}%`
           );
         }
-        
-        invoke('plugin:aptabase|track_event', {
-          name: 'alert_shown',
-          props: { percentage: payload.percentage, video_id: videoId, is_test: false }
-        }).catch(console.error);
       } catch (e) {
         console.error('Failed to parse alert payload', e);
       }
@@ -147,7 +152,6 @@ export function AlertWindow() {
 
     // Listen for testing button dispatch from the main window
     const unlistenTest = listen<AlertData>('test-alert-event', async (event) => {
-      const videoId = await loadSettings(); // Reload settings right before showing
       setActiveAlert(event.payload);
       setIsExiting(false);
       
@@ -156,17 +160,19 @@ export function AlertWindow() {
       await appWindow.show();
       await appWindow.setFocus();
 
+      loadSettings().then(videoId => {
+        invoke('plugin:aptabase|track_event', {
+          name: 'alert_shown',
+          props: { percentage: event.payload.percentage, video_id: videoId, is_test: true }
+        }).catch(console.error);
+      });
+
       if (enableSystemNotification) {
         await safeSendNotification(
           event.payload.is_critical ? '⚠️ CRITICAL BATTERY' : '🔋 Low Battery',
           `Battery is at ${event.payload.percentage}%`
         );
       }
-
-      invoke('plugin:aptabase|track_event', {
-        name: 'alert_shown',
-        props: { percentage: event.payload.percentage, video_id: videoId, is_test: true }
-      }).catch(console.error);
     });
 
     // Remove body dot pattern for transparent window
