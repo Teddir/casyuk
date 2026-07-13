@@ -5,15 +5,15 @@ import { useState } from 'react';
 const PAYMENT_LINKS: Record<string, { dodo: string, lemon: string }> = {
   Professional: {
     dodo: "https://checkout.dodopayments.com/buy/pdt_0NitTh1iyWUvaxjQYgizi?quantity=1",
-    lemon: "#"
+    lemon: "https://store.casyuk.com/checkout/buy/68663412-ec65-4485-90ad-fe320f0aeb10?media=0&enabled=1903878"
   },
   'Power User': {
     dodo: "https://checkout.dodopayments.com/buy/pdt_0NitUww3iEmtICaVfbadF?quantity=1", // Update with Dodo Power User link later
-    lemon: "#"
+    lemon: "https://store.casyuk.com/checkout/buy/43effe0e-9a78-46e3-b537-33cb074a6ae0?media=0&enabled=1903892"
   },
   Team: {
     dodo: "https://checkout.dodopayments.com/buy/pdt_0NitVm40DJ1yoQTZUFTu1?quantity=1", // Update with Dodo Team link later
-    lemon: "#"
+    lemon: "https://store.casyuk.com/checkout/buy/2c8b703f-da87-4ae6-accc-ce826431f642?media=0&enabled=1903896"
   }
 };
 
@@ -222,6 +222,24 @@ export function Pricing() {
             <p style={{ margin: 0, color: 'var(--text-muted)', fontWeight: 600 }}>Choose your preferred merchant to complete the purchase.</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '8px' }}>
+
+              <NeoButton href={PAYMENT_LINKS[selectedPlan]?.lemon} variant="secondary" style={{
+                width: '100%',
+                backgroundColor: '#7047EB',
+                color: '#fff',
+                border: '3px solid #000',
+                fontSize: '1.1rem',
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+              }} >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M14.5 3.5C14.5 3.5 19 3 20 4C21 5 20.5 9.5 20.5 9.5C20.5 9.5 22 14.5 18 18.5C14 22.5 9.5 21 9.5 21C9.5 21 4.5 20.5 3.5 19.5C2.5 18.5 3 14 3 14C3 14 2.5 9 6.5 5C10.5 1 14.5 3.5 14.5 3.5Z" fill="#FFC233" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Buy via Lemon Squeezy
+              </NeoButton>
               <NeoButton href={PAYMENT_LINKS[selectedPlan]?.dodo} style={{
                 width: '100%', backgroundColor: '#000', color: '#fff',
                 fontSize: '1.1rem', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px'
@@ -230,27 +248,6 @@ export function Pricing() {
                   <path d="M8 7V17H13.5C15.9853 17 18 14.7614 18 12C18 9.23858 15.9853 7 13.5 7H8Z" stroke="#00D084" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Buy via Dodo Payments
-              </NeoButton>
-
-              <NeoButton href={PAYMENT_LINKS[selectedPlan]?.lemon} variant="secondary" style={{
-                width: '100%',
-                // backgroundColor: '#7047EB',
-                // color: '#fff',
-                // border: '3px solid #000',
-                fontSize: '1.1rem',
-                padding: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '12px',
-                color: 'var(--text-main)',
-                backgroundColor: 'var(--card-bg)',
-                border: '3px solid var(--text-main)',
-              }} >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M14.5 3.5C14.5 3.5 19 3 20 4C21 5 20.5 9.5 20.5 9.5C20.5 9.5 22 14.5 18 18.5C14 22.5 9.5 21 9.5 21C9.5 21 4.5 20.5 3.5 19.5C2.5 18.5 3 14 3 14C3 14 2.5 9 6.5 5C10.5 1 14.5 3.5 14.5 3.5Z" fill="#FFC233" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Buy via Lemon Squeezy (Coming Soon)
               </NeoButton>
             </div>
 

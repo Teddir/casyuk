@@ -46,7 +46,7 @@ export function MainLayout() {
       {/* Announcement Bar */}
       {showAnnouncement && (
         <div className="announcement-bar">
-          <span>🚀 LAUNCH PROMO: Get CasYuk Professional for just $5 (50% OFF!)</span>
+          <span>🚀 LAUNCH PROMO: Get CasYuk for just $5 (50% OFF!)</span>
           <Link to="/pricing" className="announcement-link">Claim Now</Link>
           <button
             onClick={() => setShowAnnouncement(false)}
