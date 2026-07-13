@@ -1,0 +1,1 @@
+# How to Stop Your Windows Laptop from Overcharging\n\nUnlike macOS, Windows does not have a universal battery limiter. You usually have to rely on bloatware from Dell or Lenovo.\n\nCasYuk is a universal solution that uses WMI to interface with the hardware across different laptop brands, preventing overcharging universally.

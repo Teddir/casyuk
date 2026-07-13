@@ -1,0 +1,1 @@
+# Battery Cycle Count Explained\n\nA charge cycle happens when you use all of the battery’s power, but not necessarily in one charge. Modern MacBooks are rated for 1000 cycles.\n\nIf you are buying a used MacBook, aim for under 300 cycles. To keep your own cycle count low, limit your charging to 80% with CasYuk.

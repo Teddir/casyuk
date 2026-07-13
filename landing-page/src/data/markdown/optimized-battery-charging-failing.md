@@ -1,0 +1,1 @@
+# The Flaw in Machine Learning Charging\n\nApple's Optimized Battery Charging relies on machine learning to predict your schedule. If you have an irregular schedule (like freelancers or students), the algorithm panics and just charges to 100%.\n\nDon't rely on algorithms. Rely on hard limits with CasYuk.

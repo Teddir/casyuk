@@ -1,0 +1,1 @@
+# 5 Ways to Save Your Battery\n\n1. **Stop at 80%**: Use CasYuk to limit charge.\n2. **Avoid Heat**: Do not use it on a blanket.\n3. **Do not drain to 0%**: Plug in at 20%.\n4. **Update your OS**: Power management patches help.\n5. **Use low power mode**: When doing light work, throttle the CPU to save heat.

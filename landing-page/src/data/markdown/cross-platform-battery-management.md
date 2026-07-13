@@ -1,0 +1,1 @@
+# Managing Batteries Across Mac, Win, and Linux\n\nIf you own a MacBook for work and a Windows rig for gaming, finding unified tools is hard. CasYuk bridges the gap by offering a single, beautiful interface to manage battery health across all major operating systems.

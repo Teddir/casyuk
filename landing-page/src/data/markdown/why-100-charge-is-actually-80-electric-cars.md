@@ -1,0 +1,1 @@
+# EV Batteries vs Laptop Batteries\n\nElectric vehicle manufacturers like Tesla soft-cap their batteries. When your car says 100%, it is physically only at 80% or 90% to prevent degradation.\n\nApple and PC makers do not do this because they want to advertise the maximum possible battery life. You have to manually enforce this soft-cap using CasYuk.

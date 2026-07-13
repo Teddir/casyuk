@@ -1,0 +1,1 @@
+# DIY MacBook Battery Replacement\n\nReplacing a modern MacBook battery involves dangerous solvents to dissolve industrial glue. It is a massive fire hazard.\n\nInstead of risking a thermal runaway event in your living room, extend the life of your original battery by keeping it between 20% and 80% with CasYuk.

@@ -1,0 +1,1 @@
+# How to Check Battery Health on macOS\n\nCurious if your battery is degraded? Hold the **Option** key and click the Apple menu, then select **System Information**. Under **Power**, you will see your Cycle Count and Condition.\n\nIf your condition says "Service Recommended", it is time for a replacement. Prevent this from happening to your next battery by using CasYuk.

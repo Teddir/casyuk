@@ -1,0 +1,1 @@
+# Windows Smart Charging vs CasYuk\n\nWindows 11 includes "Smart Charging," but it is notorious for being unpredictable. It rarely triggers when you actually want it to.\n\nCasYuk gives you manual, deterministic control. You set it to 80%, and it stays at 80%. No AI guessing games.

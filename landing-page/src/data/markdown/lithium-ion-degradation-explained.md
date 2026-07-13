@@ -1,0 +1,1 @@
+# The Physics of Degradation\n\nEvery charge cycle causes micro-fractures in the cathode of a lithium-ion cell, leading to solid electrolyte interphase (SEI) buildup. This buildup increases internal resistance.\n\nBy limiting the max voltage to 80% (around 3.92V/cell instead of 4.2V), you exponentially decrease the rate of micro-fracturing.
